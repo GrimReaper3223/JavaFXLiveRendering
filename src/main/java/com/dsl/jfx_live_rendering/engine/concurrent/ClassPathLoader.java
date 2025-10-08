@@ -16,12 +16,13 @@ public class ClassPathLoader implements Callable<List<Path>> {
 
 	@Override
 	public List<Path> call() throws Exception {
-		Path classPath = SessionManager.getInstance().getSession().getClassPath();
     	List<Path> files = new ArrayList<>();
-		Files.walkFileTree(classPath, new SimpleFileVisitor<Path>() {
+		Files.walkFileTree(SessionManager.getInstance().getSession().getClassPath(), new SimpleFileVisitor<Path>() {
 			@Override
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-				files.add(classPath.relativize(file));
+				if(file.toString().endsWith(".class")) {
+					files.add(file);
+				}
 				return FileVisitResult.CONTINUE;
 			}
 		});

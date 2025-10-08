@@ -30,7 +30,7 @@ public class Renderer implements Callable<Node> {
 
 		CustomClassLoader cl = new CustomClassLoader();
 
-		ModuleFinder dependenciesFinder = ModuleFinder.of(sessionInstance.getClassPathList().toArray(Path[]::new));
+		ModuleFinder dependenciesFinder = ModuleFinder.of(sessionInstance.getPomDependenciesPathList().toArray(Path[]::new));
 		ModuleLayer layer = ModuleLayer.boot();
 		Configuration config = layer.configuration().resolve(dependenciesFinder, ModuleFinder.of(), Set.of(applicationModuleName));
 

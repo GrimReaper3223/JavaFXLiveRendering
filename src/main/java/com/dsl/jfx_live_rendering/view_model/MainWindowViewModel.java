@@ -4,8 +4,11 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.dsl.jfx_live_rendering.engine.concurrent.ClassPathLoader;
+import com.dsl.jfx_live_rendering.engine.impl.LoggerImpl;
+import com.dsl.jfx_live_rendering.engine.impl.WatchServiceImpl;
 import com.dsl.jfx_live_rendering.gui.ContentTab;
 import com.dsl.jfx_live_rendering.gui.FXUtils;
 import com.dsl.jfx_live_rendering.session_manager.Session;
@@ -36,12 +39,19 @@ public final class MainWindowViewModel implements ServiceConverter<List<Path>> {
 	private Session session = SessionManager.getInstance().getSession();
 
 	public MainWindowViewModel() {
+		new WatchServiceImpl();
 		classPathLoaderService.setOnSucceeded(_ -> {
 			session.setClassPathList(classPathLoaderService.getValue());
 			setClassPathFileList(session.getClassPathList());
 		});
 		classPathLoaderService.setOnFailed(_ -> setLog("Failed to load classpath files: " + classPathLoaderService.getException().getMessage()));
 		setClassPathFileList(session.getClassPathList());
+
+		new Thread(() -> {
+			do {
+				log.set(LoggerImpl.getLog());
+			} while(Thread.currentThread().isAlive());
+		}).start();
 	}
 
 	/*
@@ -81,12 +91,12 @@ public final class MainWindowViewModel implements ServiceConverter<List<Path>> {
 		return contentTabMap.get(tabName);
 	}
 
-	public <T extends Tab> void addContentTabToMap(final T tab) {
-		contentTabMap.computeIfPresent(tab.getText(), (_, _) -> FXUtils.tabCast(tab));
+	public <T extends Tab> void addContentTabToMap(final List<T> tabList) {
+		tabList.stream().filter(tab -> Objects.nonNull(getContentTabFromMap(tab.getText()))).forEach(tab -> contentTabMap.computeIfPresent(tab.getText(), (_, _) -> FXUtils.tabCast(tab)));
 	}
 
-	public <T extends Tab> void removeContentTabFromMap(final T tab) {
-		contentTabMap.remove(tab.getText());
+	public <T extends Tab> void removeContentTabFromMap(final List<T> tabList) {
+		tabList.stream().filter(tab -> getContentTabFromMap(tab.getText()) != null).forEach(tab -> contentTabMap.remove(tab.getText()));
 	}
 
 	/*

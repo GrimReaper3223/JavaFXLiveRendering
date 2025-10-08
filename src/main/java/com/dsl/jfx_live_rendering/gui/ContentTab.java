@@ -32,9 +32,9 @@ public class ContentTab extends Tab implements ServiceConverter<Node> {
 		renderingService.setOnSucceeded(this::onLiveRendering);
 		renderingService.setOnFailed(this::onErrorRendering);
 		tabRenderingState.addListener((_, _, nv) -> {
-			status.set(nv.getStateDescription());
-			loadedClass.set("%s %s".formatted(P.Status.LOADED_CLASS, this.className));
-			lastUpdated.set(nv.getLastUpdatedDescription());
+			setStatus(nv.getStateDescription());
+			setLoadedClass("%s %s".formatted(P.Status.LOADED_CLASS, this.className));
+			setLastUpdated(nv.getLastUpdatedDescription());
 		});
 
 		contentProperty().bind(renderingService.valueProperty());
@@ -103,7 +103,7 @@ public class ContentTab extends Tab implements ServiceConverter<Node> {
 	 */
 	// faz algumas verificacoes antes de alterar o estado da tab. o estado nao pode ser nulo e nao pode estar com erro
 	private boolean onRenderingProxy() {
-		return getTabRenderingState() != null && !getTabRenderingState().equals(TabRenderingState.ERROR_RENDERING);
+		return getTabRenderingState() == null || !getTabRenderingState().equals(TabRenderingState.ERROR_RENDERING);
 	}
 
 	// apenas a renderizacao forcada deve bypassar o metodo onRenderingProxy

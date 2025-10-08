@@ -18,7 +18,7 @@ public class CustomClassLoader extends ClassLoader {
     	return defineClass(binaryClassName, classData, 0, classData.length);
     }
 
-    private byte[] loadClassData() throws ClassNotFoundException {
+    private byte[] loadClassData() {
     	ByteArrayOutputStream baos = new ByteArrayOutputStream();
     	try(InputStream in = Files.newInputStream(SessionManager.getInstance().getSession().getClassPath())) {
     		int i;
@@ -27,7 +27,6 @@ public class CustomClassLoader extends ClassLoader {
     		}
     	} catch (IOException e) {
 			e.printStackTrace();
-			throw new ClassNotFoundException(e.getMessage(), e);
 		}
     	return baos.toByteArray();
     }

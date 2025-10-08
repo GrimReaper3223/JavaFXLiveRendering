@@ -2,8 +2,6 @@ package com.dsl.jfx_live_rendering.gui;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -14,8 +12,6 @@ import com.dsl.jfx_live_rendering.view_model.MainWindowViewModel;
 
 import module javafx.base;
 import module javafx.controls;
-import javafx.application.Platform;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane.TabDragPolicy;
 
 public class MainWindow extends BorderPane implements BorderPaneConfigHelper {
@@ -182,16 +178,18 @@ public class MainWindow extends BorderPane implements BorderPaneConfigHelper {
 		tabPane.getTabs().addListener((ListChangeListener<Tab>) listener -> {
 			listener.next();
 			if (listener.wasAdded()) {
-				listener.getAddedSubList().stream().filter(tab -> Objects.nonNull(mainWindowVM.getContentTabFromMap(tab.getText()))).forEach(mainWindowVM::addContentTabToMap);
+				mainWindowVM.addContentTabToMap(listener.getAddedSubList());
 			} else if (listener.wasRemoved()) {
-				listener.getRemoved().stream().filter(tab -> mainWindowVM.getContentTabFromMap(tab.getText()) != null).forEach(mainWindowVM::removeContentTabFromMap);
+				mainWindowVM.removeContentTabFromMap(listener.getRemoved());
 			}
 		});
 	}
 
 	private void bottomPaneSetupActions() {
 		// DEBUG: verificar se ao limpar a selecao do tabpane, o parametro 'tab' atualiza para null
-		tabPane.getSelectionModel().selectedItemProperty().addListener((_, _, tab) -> updateTabStatusInfo(tab != null ? FXUtils.tabCast(tab) : null));
+		tabPane.getSelectionModel().selectedItemProperty().addListener((_, _, tab) -> {
+			updateTabStatusInfo(tab != null ? FXUtils.tabCast(tab) : null);
+		});
 	}
 
 	// NOTE: verificar se podemos aprimorar este metodo
