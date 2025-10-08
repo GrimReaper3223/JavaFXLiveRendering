@@ -1,0 +1,87 @@
+{
+  "filePath": "src/main/resources/values/strings/gui-text.properties",
+  "fileHash": 1297831199,
+  "javaType": "java.lang.String",
+  "entries": {
+    "-1892462351": {
+      "propKey": "pompath",
+      "rawPropValue": "Pom File Path:",
+      "parsedPropValue": "\"Pom File Path:\""
+    },
+    "570970063": {
+      "propKey": "select.class",
+      "rawPropValue": "Select Class",
+      "parsedPropValue": "\"Select Class\""
+    },
+    "1144697683": {
+      "propKey": "unpause.render",
+      "rawPropValue": "Unpause Render",
+      "parsedPropValue": "\"Unpause Render\""
+    },
+    "1947822259": {
+      "propKey": "set.classpath",
+      "rawPropValue": "Set Class Path...",
+      "parsedPropValue": "\"Set Class Path...\""
+    },
+    "59158986": {
+      "propKey": "always.show.log",
+      "rawPropValue": "Always Show Log Area",
+      "parsedPropValue": "\"Always Show Log Area\""
+    },
+    "-758308191": {
+      "propKey": "render",
+      "rawPropValue": "Render",
+      "parsedPropValue": "\"Render\""
+    },
+    "1622275132": {
+      "propKey": "set.pompath",
+      "rawPropValue": "Set pom.xml Path...",
+      "parsedPropValue": "\"Set pom.xml Path...\""
+    },
+    "-1266608077": {
+      "propKey": "pause.render",
+      "rawPropValue": "Pause Render",
+      "parsedPropValue": "\"Pause Render\""
+    },
+    "-853393007": {
+      "propKey": "classpath",
+      "rawPropValue": "Class Path:",
+      "parsedPropValue": "\"Class Path:\""
+    },
+    "-1607288383": {
+      "propKey": "unload.classpath",
+      "rawPropValue": "Unload Class Path",
+      "parsedPropValue": "\"Unload Class Path\""
+    },
+    "-1400852013": {
+      "propKey": "log.area",
+      "rawPropValue": "Log Area",
+      "parsedPropValue": "\"Log Area\""
+    },
+    "995054265": {
+      "propKey": "choose.another.classpath",
+      "rawPropValue": "Choose Another Class Path",
+      "parsedPropValue": "\"Choose Another Class Path\""
+    },
+    "-2111126029": {
+      "propKey": "force.reload",
+      "rawPropValue": "Force Reload",
+      "parsedPropValue": "\"Force Reload\""
+    },
+    "-46804305": {
+      "propKey": "clear.log",
+      "rawPropValue": "Clear Log",
+      "parsedPropValue": "\"Clear Log\""
+    },
+    "-744730559": {
+      "propKey": "copy.to.clipboard",
+      "rawPropValue": "Copy to Clipboard",
+      "parsedPropValue": "\"Copy to Clipboard\""
+    },
+    "102636001": {
+      "propKey": "init",
+      "rawPropValue": "Init",
+      "parsedPropValue": "\"Init\""
+    }
+  }
+}

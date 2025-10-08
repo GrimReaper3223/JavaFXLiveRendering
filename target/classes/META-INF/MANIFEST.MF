@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Build-Jdk-Spec: 21
+Build-Tool: Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825
+ b)
+Build-Jdk: 21.0.8 (Eclipse Adoptium)
+Build-Os: Linux (6.16.10-zen1-1-zen; amd64)
+Class-Path: PropsClassGenerator-1.2.jar junit-jupiter-api-5.11.4.jar ope
+ ntest4j-1.3.0.jar junit-platform-commons-1.11.4.jar apiguardian-api-1.1
+ .2.jar gson-2.10.jar javaparser-symbol-solver-core-3.27.0.jar javaparse
+ r-core-3.27.0.jar javassist-3.30.2-GA.jar guava-33.4.8-jre.jar failurea
+ ccess-1.0.3.jar listenablefuture-9999.0-empty-to-avoid-conflict-with-gu
+ ava.jar jspecify-1.0.0.jar error_prone_annotations-2.36.0.jar j2objc-an
+ notations-3.0.0.jar central-publishing-maven-plugin-0.8.0.jar plexus-ut
+ ils-3.5.1.jar packageurl-java-1.4.1.jar commons-io-2.15.1.jar commons-l
+ ang3-3.12.0.jar jackson-databind-2.16.1.jar jackson-annotations-2.16.1.
+ jar jackson-core-2.16.1.jar httpclient5-5.3.1.jar httpcore5-5.2.4.jar h
+ ttpcore5-h2-5.2.4.jar slf4j-api-1.7.36.jar checker-qual-3.49.5.jar java
+ fx-base-25-ea+21.jar javafx-base-25-ea+21-linux.jar javafx-graphics-25-
+ ea+21.jar javafx-graphics-25-ea+21-linux.jar javafx-controls-25-ea+21.j
+ ar javafx-controls-25-ea+21-linux.jar log4j-api-2.23.1.jar log4j-core-2
+ .23.1.jar controlsfx-11.2.2.jar ikonli-javafx-12.3.1.jar ikonli-core-12
+ .3.1.jar ikonli-materialdesign2-pack-12.3.1.jar
+Main-Class: com.dsl.jfx_live_renderer.Main
+Created-By: Maven Integration for Eclipse
+

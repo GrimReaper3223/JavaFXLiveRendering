@@ -1,0 +1,27 @@
+{
+  "filePath": "src/main/resources/values/strings/metadata.properties",
+  "fileHash": 1303171484,
+  "javaType": "java.lang.String",
+  "entries": {
+    "-1690451188": {
+      "propKey": "app.name",
+      "rawPropValue": "JavaFXLiveRenderer",
+      "parsedPropValue": "\"JavaFXLiveRenderer\""
+    },
+    "481307859": {
+      "propKey": "app.version",
+      "rawPropValue": "v0.1",
+      "parsedPropValue": "\"v0.1\""
+    },
+    "-697959746": {
+      "propKey": "app.author",
+      "rawPropValue": "Deiv (GrimReaper)",
+      "parsedPropValue": "\"Deiv (GrimReaper)\""
+    },
+    "1865821323": {
+      "propKey": "app.homepage",
+      "rawPropValue": "https://github.com/GrimReaper3223/JavaFXLiveRendering",
+      "parsedPropValue": "\"https://github.com/GrimReaper3223/JavaFXLiveRendering\""
+    }
+  }
+}

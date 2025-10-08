@@ -1,0 +1,82 @@
+{
+  "filePath": "src/main/resources/values/strings/status.properties",
+  "fileHash": 1310452119,
+  "javaType": "java.lang.String",
+  "entries": {
+    "-1076614697": {
+      "propKey": "rendering.error",
+      "rawPropValue": "Status: Rendering Error",
+      "parsedPropValue": "\"Status: Rendering Error\""
+    },
+    "1981131347": {
+      "propKey": "analyzing.classpath",
+      "rawPropValue": "Analyzing class path...",
+      "parsedPropValue": "\"Analyzing class path...\""
+    },
+    "-1465994795": {
+      "propKey": "error.javafx.subclass.not.founded",
+      "rawPropValue": "There are no JavaFX component subclasses in this class path.",
+      "parsedPropValue": "\"There are no JavaFX component subclasses in this class path.\""
+    },
+    "-592519771": {
+      "propKey": "loading.data",
+      "rawPropValue": "Loading data...",
+      "parsedPropValue": "\"Loading data...\""
+    },
+    "-850798654": {
+      "propKey": "rendering.forced",
+      "rawPropValue": "Status: Rendering Was Forced",
+      "parsedPropValue": "\"Status: Rendering Was Forced\""
+    },
+    "-1470752678": {
+      "propKey": "classpath.loaded",
+      "rawPropValue": "Class Path Loaded Successfully",
+      "parsedPropValue": "\"Class Path Loaded Successfully\""
+    },
+    "-2138275965": {
+      "propKey": "rendering.live",
+      "rawPropValue": "Status: Live Rendering",
+      "parsedPropValue": "\"Status: Live Rendering\""
+    },
+    "880712079": {
+      "propKey": "loaded.class",
+      "rawPropValue": "Loaded Class:",
+      "parsedPropValue": "\"Loaded Class:\""
+    },
+    "-849837942": {
+      "propKey": "analyzing.pom",
+      "rawPropValue": "Analyzing pom.xml file...",
+      "parsedPropValue": "\"Analyzing pom.xml file...\""
+    },
+    "1085443110": {
+      "propKey": "rendering.unpaused",
+      "rawPropValue": "Status: Rendering Unpaused (Not Updated Yet)",
+      "parsedPropValue": "\"Status: Rendering Unpaused (Not Updated Yet)\""
+    },
+    "959562727": {
+      "propKey": "last.updated",
+      "rawPropValue": "Last Updated:",
+      "parsedPropValue": "\"Last Updated:\""
+    },
+    "-1395041022": {
+      "propKey": "error.file.is.not.pom.xml",
+      "rawPropValue": "This file is not a valid pom.xml file.",
+      "parsedPropValue": "\"This file is not a valid pom.xml file.\""
+    },
+    "-2116690322": {
+      "propKey": "valid.pom",
+      "rawPropValue": "Validated pom.xml.",
+      "parsedPropValue": "\"Validated pom.xml.\""
+    },
+    "1789724913": {
+      "propKey": "valid.classpath",
+      "rawPropValue": "%d JavaFX subclasses found.",
+      "parsedPropValue": "\"%d JavaFX subclasses found.\""
+    },
+    "1972758315": {
+      "propKey": "rendering.paused",
+      "rawPropValue": "Status: Rendering Paused",
+      "parsedPropValue": "\"Status: Rendering Paused\""
+    }
+  }
+}
