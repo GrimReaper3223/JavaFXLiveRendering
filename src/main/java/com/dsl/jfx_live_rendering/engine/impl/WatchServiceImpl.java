@@ -9,11 +9,15 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent;
+import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
+import com.dsl.jfx_live_rendering.engine.Context;
 import com.dsl.jfx_live_rendering.models.ProcessedPathModel;
 import com.dsl.jfx_live_rendering.session_manager.SessionManager;
 
@@ -29,11 +33,17 @@ public class WatchServiceImpl {
 		try {
 			this.watcher = FileSystems.getDefault().newWatchService();
 			this.keyMap = new HashMap<>();
-			register();
-			new Thread(this::processEvents).start();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void registerDirsAndStartWatch() {
+		register();
+		Thread wsiThread = new Thread(this::processEvents);
+		wsiThread.setDaemon(true);
+		wsiThread.setName("WatchServiceImpl-Thread");
+		wsiThread.start();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -41,7 +51,7 @@ public class WatchServiceImpl {
 		return (WatchEvent<T>) event;
 	}
 
-	public void register() {
+	private void register() {
 		SessionManager.getInstance().getSession().getClassPathList().forEach(filePath -> {
 			try {
 				if(classNodeValidator(filePath)) {
@@ -83,15 +93,22 @@ public class WatchServiceImpl {
 				if (dirPath == null) {
 					LoggerImpl.log("WatchKey has an unrecognized path.");
 				} else {
-					var list = key.pollEvents().stream().filter(evt -> evt.kind() != OVERFLOW).map(evt -> {
-						WatchEvent<Path> event = cast(evt);
-						return Map.entry(event.kind(), event.context());
-					}).filter(entry -> entry.getValue().toString().contains(".class")).map(entry -> {
-						LoggerImpl.log(String.format("%s: %s", entry.getKey(), entry.getValue().toString()));
-						return entry;
-					}).toList();
+					Context.putChangedPathQueue(key.pollEvents()
+							.stream()
+							.filter(evt -> evt.kind() != OVERFLOW)
+							.map(evt -> {
+								WatchEvent<Path> event = cast(evt);
+								Kind<Path> kind = event.kind();
+								Path context = dirPath.resolve(event.context());
 
-//					StaticContext.setChangedPaths(list);
+								if (context.toString().endsWith(".class")) {
+									LoggerImpl.log(String.format("%s: %s", kind, context.getFileName().toString()));
+									return Map.entry(kind, context);
+								}
+								return null;
+							})
+							.filter(Objects::nonNull)
+							.collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList()))));
 
 					if (!key.reset()) {
 						keyMap.remove(key);

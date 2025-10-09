@@ -163,6 +163,19 @@ public class MainWindow extends BorderPane implements BorderPaneConfigHelper {
 				mainWindowVM.setClassPath(response.toPath());
 			}
 		});
+
+		mainWindowVM.changedPathEntryProperty().addListener(_ -> {
+			try {
+				var entry = mainWindowVM.transformEntries();
+				switch (entry.getKey().name()) {
+					case "ENTRY_DELETE" -> entry.getValue().forEach(ct -> ct.setTabRenderingState(TabRenderingState.ERROR_RENDERING));
+					case "ENTRY_MODIFY" -> entry.getValue().forEach(ContentTab::runService);
+					default -> throw new IllegalArgumentException("Unknown WatchEvent.Kind: " + entry.getKey().name());
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
 	}
 
 	private void centerPaneSetupActions() {
@@ -186,10 +199,7 @@ public class MainWindow extends BorderPane implements BorderPaneConfigHelper {
 	}
 
 	private void bottomPaneSetupActions() {
-		// DEBUG: verificar se ao limpar a selecao do tabpane, o parametro 'tab' atualiza para null
-		tabPane.getSelectionModel().selectedItemProperty().addListener((_, _, tab) -> {
-			updateTabStatusInfo(tab != null ? FXUtils.tabCast(tab) : null);
-		});
+		tabPane.getSelectionModel().selectedItemProperty().addListener((_, _, tab) -> updateTabStatusInfo(tab != null ? FXUtils.tabCast(tab) : null));
 	}
 
 	// NOTE: verificar se podemos aprimorar este metodo
