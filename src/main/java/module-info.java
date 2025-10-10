@@ -2,6 +2,8 @@ module javaFXLiveRendering {
 	requires transitive javafx.base;
     requires transitive javafx.graphics;
     requires transitive javafx.controls;
+    requires transitive javafx.fxml;
+    requires transitive javafx.web;
     requires transitive org.controlsfx.controls;
     requires transitive com.dsl.classgen;
 

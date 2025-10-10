@@ -17,9 +17,12 @@ Class-Path: PropsClassGenerator-1.2.jar junit-jupiter-api-5.11.4.jar ope
  ttpcore5-h2-5.2.4.jar slf4j-api-1.7.36.jar checker-qual-3.49.5.jar java
  fx-base-25-ea+21.jar javafx-base-25-ea+21-linux.jar javafx-graphics-25-
  ea+21.jar javafx-graphics-25-ea+21-linux.jar javafx-controls-25-ea+21.j
- ar javafx-controls-25-ea+21-linux.jar log4j-api-2.23.1.jar log4j-core-2
- .23.1.jar controlsfx-11.2.2.jar ikonli-javafx-12.3.1.jar ikonli-core-12
- .3.1.jar ikonli-materialdesign2-pack-12.3.1.jar
+ ar javafx-controls-25-ea+21-linux.jar javafx-fxml-25-ea+21.jar javafx-f
+ xml-25-ea+21-linux.jar javafx-web-25-ea+21.jar javafx-web-25-ea+21-linu
+ x.jar javafx-media-25-ea+21.jar javafx-media-25-ea+21-linux.jar jdk-jso
+ bject-25-ea+21.jar jdk-jsobject-25-ea+21-linux.jar log4j-api-2.23.1.jar
+  log4j-core-2.23.1.jar controlsfx-11.2.2.jar ikonli-javafx-12.3.1.jar i
+ konli-core-12.3.1.jar ikonli-materialdesign2-pack-12.3.1.jar
 Main-Class: com.dsl.jfx_live_renderer.Main
 Created-By: Maven Integration for Eclipse
 

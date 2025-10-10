@@ -13,13 +13,13 @@ import module javafx.controls;
 
 public class ContentTab extends Tab implements ServiceConverter<Node> {
 
-	private ObjectProperty<TabRenderingState> tabRenderingState = new SimpleObjectProperty<>();
+	private ObjectProperty<TabRenderingState> tabRenderingState = new SimpleObjectProperty<>(TabRenderingState.IDLE);
 
 	private StringProperty status = new SimpleStringProperty();
 	private StringProperty loadedClass = new SimpleStringProperty();
 	private StringProperty lastUpdated = new SimpleStringProperty();
 
-	private final Service<Node> renderingService;
+	private Service<Node> renderingService;
 	private final String className;
 
 	public ContentTab(Path file) {
@@ -35,7 +35,6 @@ public class ContentTab extends Tab implements ServiceConverter<Node> {
 			setLoadedClass("%s %s".formatted(P.Status.LOADED_CLASS, this.className));
 			setLastUpdated(nv.getLastUpdatedDescription());
 		});
-
 		contentProperty().bind(renderingService.valueProperty());
 		runService();
 	}
@@ -100,33 +99,33 @@ public class ContentTab extends Tab implements ServiceConverter<Node> {
 	/*
 	 * onRenderingState methods
 	 */
-	// faz algumas verificacoes antes de alterar o estado da tab. o estado nao pode ser nulo e nao pode estar com erro
 	private boolean isValidState() {
-		return getTabRenderingState() == null || !getTabRenderingState().equals(TabRenderingState.ERROR_RENDERING);
+		return !getTabRenderingState().equals(TabRenderingState.ERROR_RENDERING);
 	}
 
 	// apenas a renderizacao forcada deve bypassar o metodo onRenderingProxy
 	public void onForceRendering() {
 		LoggerImpl.log(String.format("Forced reload for tab '%s' requested.", className));
+		tabRenderingState.set(TabRenderingState.FORCED_RENDERING);
 		runService();
 	}
 
 	public void onLiveRendering(WorkerStateEvent wse) {
-		if(isValidState()) {
+		if(isValidState() && !getTabRenderingState().equals(TabRenderingState.PAUSED_RENDERING)) {
 			LoggerImpl.log(String.format("'%s' tab is now rendering live.", className));
 			tabRenderingState.set(TabRenderingState.LIVE_RENDERING);
 		}
 	}
 
 	public void onPauseRendering() {
-		if(isValidState()) {
+		if(isValidState() && getTabRenderingState().equals(TabRenderingState.LIVE_RENDERING)) {
     		LoggerImpl.log("'%s' tab has had its rendering suspended.".formatted(className));
     		tabRenderingState.set(TabRenderingState.PAUSED_RENDERING);
 		}
 	}
 
 	public void onUnpauseRendering() {
-		if(isValidState()) {
+		if(isValidState() && getTabRenderingState().equals(TabRenderingState.PAUSED_RENDERING)) {
 			LoggerImpl.log("Tab '%s' has unpaused rendering. Updating content...".formatted(className));
 			tabRenderingState.set(TabRenderingState.UNPAUSED_RENDERING);
 			runService();

@@ -29,9 +29,10 @@ import javafx.scene.control.Tab;
 
 public final class MainWindowViewModel implements ServiceConverter<List<Path>> {
 
-	private ObjectProperty<ObservableList<Path>> classPathFileList = new SimpleObjectProperty<>(FXCollections.observableArrayList());
-	private StringProperty log = new SimpleStringProperty();
 	private Map<String, ContentTab> contentTabMap = new HashMap<>();
+
+	private ObjectProperty<ObservableList<Path>> javaFXClassList = new SimpleObjectProperty<>(FXCollections.observableArrayList());
+	private StringProperty log = new SimpleStringProperty();
 
 	// background service to load classpath files
 	private final Service<List<Path>> classPathLoaderService = toService(new ClassPathLoader());
@@ -45,11 +46,11 @@ public final class MainWindowViewModel implements ServiceConverter<List<Path>> {
 	public MainWindowViewModel() {
 		new WatchServiceImpl().registerDirsAndStartWatch();
 		classPathLoaderService.setOnSucceeded(_ -> {
-			session.setClassPathList(classPathLoaderService.getValue());
-			setClassPathFileList(session.getClassPathList());
+			session.setJavaFXClassList(classPathLoaderService.getValue()); //TODO: reanalyze new classpath looking for javafx classes
+			setJavaFXClassListToProperty(session.getJavaFXClassList());
 		});
 		classPathLoaderService.setOnFailed(_ -> setLog("Failed to load classpath files: " + classPathLoaderService.getException().getMessage()));
-		setClassPathFileList(session.getClassPathList());
+		setJavaFXClassListToProperty(session.getJavaFXClassList());
 
 		// thread to update log property
 		Thread logConsumerThread = new Thread(() -> {
@@ -62,7 +63,7 @@ public final class MainWindowViewModel implements ServiceConverter<List<Path>> {
 		Thread changedPathConsumerThread = new Thread(() -> {
 			do {
 				try {
-					setChangedPathEntry(Context.getChangedPathQueue());
+					setChangedPathEntry(Context.getChangedPathEntry());
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -81,16 +82,16 @@ public final class MainWindowViewModel implements ServiceConverter<List<Path>> {
 	/*
 	 * classFileList property methods
 	 */
-	public ObjectProperty<ObservableList<Path>> classPathFileListProperty() {
-		return this.classPathFileList;
+	public ObjectProperty<ObservableList<Path>> javaFXClassListProperty() {
+		return this.javaFXClassList;
 	}
 
-	public ObservableList<Path> getClassPathFileList() {
-		return this.classPathFileList.get();
+	public ObservableList<Path> getJavaFXClassListFromProperty() {
+		return this.javaFXClassList.get();
 	}
 
-	public void setClassPathFileList(final List<Path> classPathFileList) {
-		this.classPathFileList.get().setAll(classPathFileList);
+	public void setJavaFXClassListToProperty(final List<Path> javaFXClassList) {
+		this.javaFXClassList.get().setAll(javaFXClassList);
 	}
 
 	/*
@@ -161,8 +162,8 @@ public final class MainWindowViewModel implements ServiceConverter<List<Path>> {
 	// internal data handler methods
 	public void unloadClassPath() {
 		session.setClassPath(null);
-		session.getClassPathList().clear();
-		getClassPathFileList().clear();
+		session.getJavaFXClassList().clear();
+		getJavaFXClassListFromProperty().clear();
 	}
 
 	public Path getClassPath() {

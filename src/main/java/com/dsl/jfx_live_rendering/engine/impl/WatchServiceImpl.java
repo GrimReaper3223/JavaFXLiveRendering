@@ -12,7 +12,9 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -52,11 +54,13 @@ public class WatchServiceImpl {
 	}
 
 	private void register() {
-		SessionManager.getInstance().getSession().getClassPathList().forEach(filePath -> {
+		List<Path> javaFXClassList = new ArrayList<>();
+		SessionManager.getInstance().getSession().getJavaFXClassList().forEach(filePath -> {
 			try {
 				if(classNodeValidator(filePath)) {
     				Path dir = Files.isDirectory(filePath) ? filePath : filePath.getParent();
     				WatchKey key = dir.register(watcher, ENTRY_DELETE, ENTRY_MODIFY);
+    				javaFXClassList.add(filePath);
 
     				if (keyMap.computeIfPresent(key, (_, _) -> dir) != null) {
     					LoggerImpl.log(String.format("Directory '%s' has updated successfully.", dir.getFileName().toString()));
@@ -70,6 +74,7 @@ public class WatchServiceImpl {
 				e.printStackTrace();
 			}
 		});
+		SessionManager.getInstance().getSession().setJavaFXClassList(javaFXClassList);
 	}
 
 	private boolean classNodeValidator(Path filePath) throws ClassNotFoundException {
@@ -93,7 +98,7 @@ public class WatchServiceImpl {
 				if (dirPath == null) {
 					LoggerImpl.log("WatchKey has an unrecognized path.");
 				} else {
-					Context.putChangedPathQueue(key.pollEvents()
+					Context.offerChangedPathEntries(key.pollEvents()
 							.stream()
 							.filter(evt -> evt.kind() != OVERFLOW)
 							.map(evt -> {

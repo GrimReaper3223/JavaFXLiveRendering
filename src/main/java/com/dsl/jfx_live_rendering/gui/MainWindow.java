@@ -135,7 +135,7 @@ public class MainWindow extends BorderPane implements BorderPaneConfigHelper {
 
 	private void topPaneSetupActions() {
 		renderLink.disableProperty().bind(selectClassFileComboBox.selectionModelProperty().getValue().selectedItemProperty().isNull());
-		selectClassFileComboBox.itemsProperty().bind(mainWindowVM.classPathFileListProperty());
+		selectClassFileComboBox.itemsProperty().bind(mainWindowVM.javaFXClassListProperty());
 
 		BooleanBinding isTabSelected = tabPane.getSelectionModel().selectedItemProperty().isNull();
 		pauseRenderButton.disableProperty().bind(isTabSelected);

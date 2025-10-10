@@ -25,7 +25,7 @@ public final class StartWindowViewModel implements ServiceConverter<List<Path>> 
 	private Service<List<Path>> pomDependenciesLoaderService = toService(new PomDependencyResolver());
 
 	public StartWindowViewModel() {
-		classPathloaderService.setOnSucceeded(_ -> session.setClassPathList(classPathloaderService.getValue()));
+		classPathloaderService.setOnSucceeded(_ -> session.setJavaFXClassList(classPathloaderService.getValue()));
 		pomDependenciesLoaderService.setOnSucceeded(_ -> session.setPomDependenciesPathList(pomDependenciesLoaderService.getValue()));
 	}
 

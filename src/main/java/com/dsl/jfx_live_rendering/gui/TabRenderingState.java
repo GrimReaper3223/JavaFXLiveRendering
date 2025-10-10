@@ -7,9 +7,11 @@ import com.dsl.jfx_live_rendering.properties.generated.P;
 
 public enum TabRenderingState {
 
+	IDLE(""),
 	LIVE_RENDERING(P.Status.RENDERING_LIVE),
 	PAUSED_RENDERING(P.Status.RENDERING_PAUSED),
 	UNPAUSED_RENDERING(P.Status.RENDERING_UNPAUSED),
+	FORCED_RENDERING(P.Status.RENDERING_FORCED),
 	ERROR_RENDERING(P.Status.RENDERING_ERROR);
 
 	private final String stateDescription;

@@ -11,7 +11,7 @@ public final class Session implements Serializable {
 
 	private Path classPath;
 	private Path pomXMLPath;
-	private List<Path> classPathList = new ArrayList<>();
+	private List<Path> javaFXClassList = new ArrayList<>();
 	private List<Path> pomDependenciesPathList = new ArrayList<>();
 
 	public Session(Path classPath, Path pomXMLPath) {
@@ -35,12 +35,12 @@ public final class Session implements Serializable {
 		this.pomXMLPath = pomXMLPath;
 	}
 
-	public List<Path> getClassPathList() {
-		return classPathList;
+	public List<Path> getJavaFXClassList() {
+		return javaFXClassList;
 	}
 
-	public void setClassPathList(List<Path> classPathList) {
-		this.classPathList = classPathList;
+	public void setJavaFXClassList(List<Path> javaFXClassList) {
+		this.javaFXClassList = javaFXClassList;
 	}
 
 	public List<Path> getPomDependenciesPathList() {
