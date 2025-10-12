@@ -3,7 +3,7 @@ Build-Jdk-Spec: 21
 Build-Tool: Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825
  b)
 Build-Jdk: 21.0.8 (Eclipse Adoptium)
-Build-Os: Linux (6.16.10-zen1-1-zen; amd64)
+Build-Os: Linux (6.17.1-zen1-1-zen; amd64)
 Class-Path: PropsClassGenerator-1.2.jar junit-jupiter-api-5.11.4.jar ope
  ntest4j-1.3.0.jar junit-platform-commons-1.11.4.jar apiguardian-api-1.1
  .2.jar gson-2.10.jar javaparser-symbol-solver-core-3.27.0.jar javaparse

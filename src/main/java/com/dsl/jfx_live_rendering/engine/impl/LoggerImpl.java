@@ -5,7 +5,7 @@ import java.util.concurrent.BlockingQueue;
 
 public class LoggerImpl {
 
-	private static final BlockingQueue<String> LOG_BUFFER = new ArrayBlockingQueue<>(1024);
+	private static final BlockingQueue<String> LOG_BUFFER = new ArrayBlockingQueue<>(2048);
 
 	private LoggerImpl() {}
 
@@ -18,7 +18,7 @@ public class LoggerImpl {
 		try {
 			log = LOG_BUFFER.take() + '\n';
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			ExceptionHandlerImpl.logException(e);
 		}
 		return log;
 	}

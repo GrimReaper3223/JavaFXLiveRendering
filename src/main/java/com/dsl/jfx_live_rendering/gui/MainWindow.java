@@ -17,7 +17,7 @@ import javafx.scene.control.TabPane.TabDragPolicy;
 public class MainWindow extends BorderPane implements BorderPaneConfigHelper {
 
 	// top pane components (TOOLBAR)
-	private Text selectClassText = new Text(P.GuiText.SELECT_CLASS);
+	private Text selectClassText = new Text(P.GuiText.SELECT_JAVAFX_CLASS);
 	private ComboBox<Path> selectClassFileComboBox = new ComboBox<>();
 	private Hyperlink renderLink = new Hyperlink(P.GuiText.RENDER);
 	private Button pauseRenderButton = new Button(P.GuiText.PAUSE_RENDER);
@@ -157,7 +157,7 @@ public class MainWindow extends BorderPane implements BorderPaneConfigHelper {
 		});
 
 		chooseAnotherClasspathLink.setOnAction(_ -> {
-			File response = onDirectoryChooserRequest(mainWindowVM.getClassPath());
+			File response = onDirectoryChooserRequest(mainWindowVM.getPomXMLPath());
 
 			if(response != null) {
 				mainWindowVM.setClassPath(response.toPath());

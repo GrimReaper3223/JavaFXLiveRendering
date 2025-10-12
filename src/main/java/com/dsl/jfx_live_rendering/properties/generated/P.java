@@ -54,9 +54,6 @@ public final class P {
         @GeneratedInnerField(key = "classpath", hash = -853393007)
         public static final String CLASSPATH = "Class Path:";
 
-        @GeneratedInnerField(key = "select.class", hash = 570970063)
-        public static final String SELECT_CLASS = "Select Class";
-
         @GeneratedInnerField(key = "choose.another.classpath", hash = 995054265)
         public static final String CHOOSE_ANOTHER_CLASSPATH = "Choose Another Class Path";
 
@@ -86,6 +83,9 @@ public final class P {
 
         @GeneratedInnerField(key = "unpause.render", hash = 1144697683)
         public static final String UNPAUSE_RENDER = "Unpause Render";
+
+        @GeneratedInnerField(key = "select.javafx.class", hash = -1242325535)
+        public static final String SELECT_JAVAFX_CLASS = "Select JavaFX Class";
     }
 
     @GeneratedInnerStaticClass(filePath = "src/main/resources/values/strings/status.properties", hash = 1310452119, javaType = String.class)

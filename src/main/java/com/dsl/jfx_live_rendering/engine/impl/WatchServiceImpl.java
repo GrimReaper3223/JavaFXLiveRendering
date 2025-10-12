@@ -12,22 +12,16 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.dsl.jfx_live_rendering.engine.Context;
-import com.dsl.jfx_live_rendering.models.ProcessedPathModel;
 import com.dsl.jfx_live_rendering.session_manager.SessionManager;
-
-import javafx.scene.Node;
 
 public class WatchServiceImpl {
 
-	private final CustomClassLoader cl = new CustomClassLoader();
 	private WatchService watcher;
 	private Map<WatchKey, Path> keyMap;
 
@@ -36,7 +30,7 @@ public class WatchServiceImpl {
 			this.watcher = FileSystems.getDefault().newWatchService();
 			this.keyMap = new HashMap<>();
 		} catch (IOException e) {
-			e.printStackTrace();
+			ExceptionHandlerImpl.logException(e);
 		}
 	}
 
@@ -54,37 +48,22 @@ public class WatchServiceImpl {
 	}
 
 	private void register() {
-		List<Path> javaFXClassList = new ArrayList<>();
 		SessionManager.getInstance().getSession().getJavaFXClassList().forEach(filePath -> {
 			try {
-				if(classNodeValidator(filePath)) {
-    				Path dir = Files.isDirectory(filePath) ? filePath : filePath.getParent();
-    				WatchKey key = dir.register(watcher, ENTRY_DELETE, ENTRY_MODIFY);
-    				javaFXClassList.add(filePath);
+				Path dir = Files.isDirectory(filePath) ? filePath : filePath.getParent();
+				WatchKey key = dir.register(watcher, ENTRY_DELETE, ENTRY_MODIFY);
 
-    				if (keyMap.computeIfPresent(key, (_, _) -> dir) != null) {
-    					LoggerImpl.log(String.format("Directory '%s' has updated successfully.", dir.getFileName().toString()));
-    				} else if (keyMap.computeIfAbsent(key, _ -> dir) != null) {
-    					LoggerImpl.log(String.format("Directory '%s' has registered successfully.", dir.getFileName().toString()));
-    				} else {
-    					LoggerImpl.log("** BUG ON DIRECTORY REGISTER (Watch Service) **: No action performed.");
-    				}
+				if (keyMap.computeIfPresent(key, (_, _) -> dir) != null) {
+					LoggerImpl.log(String.format("Directory '%s' has updated successfully.", dir.getFileName().toString()));
+				} else if (keyMap.computeIfAbsent(key, _ -> dir) != null) {
+					LoggerImpl.log(String.format("Directory '%s' has registered successfully.", dir.getFileName().toString()));
+				} else {
+					LoggerImpl.log("** BUG ON DIRECTORY REGISTER (Watch Service) **: No action performed.");
 				}
-			} catch (IOException | ClassNotFoundException e) {
-				e.printStackTrace();
+			} catch (IOException e) {
+				ExceptionHandlerImpl.logException(e);
 			}
 		});
-		SessionManager.getInstance().getSession().setJavaFXClassList(javaFXClassList);
-	}
-
-	private boolean classNodeValidator(Path filePath) throws ClassNotFoundException {
-		boolean result = false;
-		String stringFile = filePath.toString();
-		if(stringFile.endsWith(".class") && !stringFile.contains("module-info")) {
-			Class<?> cls = cl.loadClass(new ProcessedPathModel(filePath).getBinaryFileName());
-			result = Node.class.isAssignableFrom(cls);
-		}
-		return result;
 	}
 
 	private void processEvents() {
@@ -120,7 +99,7 @@ public class WatchServiceImpl {
 					}
 				}
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				ExceptionHandlerImpl.logException(e);
 			}
 		}
 	}

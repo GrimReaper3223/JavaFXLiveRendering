@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.controlsfx.control.HyperlinkLabel;
 
-import com.dsl.jfx_live_rendering.gui.events.FileSystemHandlerEvents;
+import com.dsl.jfx_live_rendering.gui.events.FileSystemEvents;
 import com.dsl.jfx_live_rendering.properties.generated.P;
 import com.dsl.jfx_live_rendering.view_model.StartWindowViewModel;
 
@@ -98,22 +98,31 @@ public class StartWindow extends BorderPane implements BorderPaneConfigHelper {
 
 		// button actions
 		setClassPathButton.setOnAction(_ -> {
-			File response = onDirectoryChooserRequest(startWindowVM.getClassPath());
+			File response = onDirectoryChooserRequest(startWindowVM.getPomXMLPath());
 
 			if(response != null) {
 				startWindowVM.setClassPath(response.toPath());
 			}
 		});
 		setPomXMLPathButton.setOnAction(_ -> {
-			File response = onFileChooserRequest(startWindowVM.getPomXMLPath());
+			File response = onFileChooserRequest(startWindowVM.getClassPath());
 
 			if(response != null) {
 				startWindowVM.setPomXMLPath(response.toPath());
 			}
 		});
 		initButton.setOnAction(_ -> {
-			this.fireEvent(new FileSystemHandlerEvents(FileSystemHandlerEvents.INIT_REQUEST_EVENT));
+			this.fireEvent(new FileSystemEvents(FileSystemEvents.INIT_REQUEST_EVENT));
 			Dialog<Void> loadingDialog = configureDialog();
+
+			/*
+			 * FIX: consertar este listener que abre a main window ao fim das tarefas.
+			 * Ele tambem controla o showing do loading dialog.
+			 * Como os servicos podem ser reiniciados a partir de outras telas, entao este listener
+			 * ainda funciona e acaba abrindo a main window novamente, mesmo que a partir de outra tela.
+			 *
+			 * TODO: Ideia: talvez a implementacao de event bus possa ajudar a resolver este problema.
+			 */
 			startWindowVM.getClassPathloaderService().runningProperty().or(startWindowVM.getPomModuleDependencyLoaderService().runningProperty()).addListener((_, _, nv) -> {
 				if(nv) {
 					loadingDialog.show();

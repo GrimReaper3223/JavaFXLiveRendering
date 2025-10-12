@@ -3,8 +3,10 @@ package com.dsl.jfx_live_rendering.view_model;
 import java.nio.file.Path;
 import java.util.List;
 
+import com.dsl.jfx_live_rendering.engine.Context;
 import com.dsl.jfx_live_rendering.engine.concurrent.ClassPathLoader;
 import com.dsl.jfx_live_rendering.engine.concurrent.PomDependencyResolver;
+import com.dsl.jfx_live_rendering.engine.impl.ExceptionHandlerImpl;
 import com.dsl.jfx_live_rendering.session_manager.Session;
 import com.dsl.jfx_live_rendering.session_manager.SessionManager;
 
@@ -21,12 +23,12 @@ public final class StartWindowViewModel implements ServiceConverter<List<Path>> 
 
 	private Session session = SessionManager.getInstance().getSession();
 
-	private Service<List<Path>> classPathloaderService = toService(new ClassPathLoader());
+	private Service<List<Path>> classPathLoaderService = toService(new ClassPathLoader());
 	private Service<List<Path>> pomDependenciesLoaderService = toService(new PomDependencyResolver());
 
 	public StartWindowViewModel() {
-		classPathloaderService.setOnSucceeded(_ -> session.setJavaFXClassList(classPathloaderService.getValue()));
-		pomDependenciesLoaderService.setOnSucceeded(_ -> session.setPomDependenciesPathList(pomDependenciesLoaderService.getValue()));
+		Context.registerService(ClassPathLoader.class, classPathLoaderService);
+		Context.registerService(PomDependencyResolver.class, pomDependenciesLoaderService);
 	}
 
 	/*
@@ -93,7 +95,7 @@ public final class StartWindowViewModel implements ServiceConverter<List<Path>> 
 	 * get services
 	 */
 	public Service<List<Path>> getClassPathloaderService() {
-		return this.classPathloaderService;
+		return this.classPathLoaderService;
 	}
 
 	public Service<List<Path>> getPomModuleDependencyLoaderService() {
@@ -106,7 +108,15 @@ public final class StartWindowViewModel implements ServiceConverter<List<Path>> 
 	public void init() {
 		session.setClassPath(getClassPath());
 		session.setPomXMLPath(getPomXMLPath());
-		classPathloaderService.start();
+
+		// set service event handlers
+		classPathLoaderService.setOnSucceeded(_ -> session.setJavaFXClassList(classPathLoaderService.getValue()));
+		classPathLoaderService.setOnFailed(wst -> ExceptionHandlerImpl.logException(wst.getSource().getException()));
+		pomDependenciesLoaderService.setOnSucceeded(_ -> session.setPomDependenciesPathList(pomDependenciesLoaderService.getValue()));
+		pomDependenciesLoaderService.setOnFailed(wst -> ExceptionHandlerImpl.logException(wst.getSource().getException()));
+
+		// start services
+		classPathLoaderService.start();
 		pomDependenciesLoaderService.start();
 	}
 }

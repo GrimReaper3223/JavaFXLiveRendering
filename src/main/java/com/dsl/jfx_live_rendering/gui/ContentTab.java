@@ -3,6 +3,7 @@ package com.dsl.jfx_live_rendering.gui;
 import java.nio.file.Path;
 
 import com.dsl.jfx_live_rendering.engine.concurrent.Renderer;
+import com.dsl.jfx_live_rendering.engine.impl.ExceptionHandlerImpl;
 import com.dsl.jfx_live_rendering.engine.impl.LoggerImpl;
 import com.dsl.jfx_live_rendering.models.ProcessedPathModel;
 import com.dsl.jfx_live_rendering.properties.generated.P;
@@ -27,15 +28,19 @@ public class ContentTab extends Tab implements ServiceConverter<Node> {
 		super(ppm.getFileName());
 		this.className = ppm.getFileName();
 
+		StackPane pane = new StackPane();
+		pane.setPadding(new Insets(10));
+
 		renderingService = toService(new Renderer(ppm.getBinaryFileName()));
 		renderingService.setOnSucceeded(this::onLiveRendering);
 		renderingService.setOnFailed(this::onErrorRendering);
+		renderingService.valueProperty().addListener((_, _, nv) -> pane.getChildren().setAll(nv));
 		tabRenderingState.addListener((_, _, nv) -> {
 			setStatus(nv.getStateDescription());
 			setLoadedClass("%s %s".formatted(P.Status.LOADED_CLASS, this.className));
 			setLastUpdated(nv.getLastUpdatedDescription());
 		});
-		contentProperty().bind(renderingService.valueProperty());
+		setContent(pane);
 		runService();
 	}
 
@@ -135,6 +140,7 @@ public class ContentTab extends Tab implements ServiceConverter<Node> {
 	public void onErrorRendering(WorkerStateEvent wse) {
 		if(isValidState()) {
 			LoggerImpl.log("An error has occurred when trying render '%s' tab.".formatted(className));
+			ExceptionHandlerImpl.logException(wse.getSource().getException());
 			tabRenderingState.set(TabRenderingState.ERROR_RENDERING);
 			renderingService.reset();
 		}

@@ -1,17 +1,12 @@
 {
   "filePath": "src/main/resources/values/strings/gui-text.properties",
-  "fileHash": 1297831199,
+  "fileHash": 1312547048,
   "javaType": "java.lang.String",
   "entries": {
     "-1892462351": {
       "propKey": "pompath",
       "rawPropValue": "Pom File Path:",
       "parsedPropValue": "\"Pom File Path:\""
-    },
-    "570970063": {
-      "propKey": "select.class",
-      "rawPropValue": "Select Class",
-      "parsedPropValue": "\"Select Class\""
     },
     "1144697683": {
       "propKey": "unpause.render",
@@ -42,6 +37,11 @@
       "propKey": "pause.render",
       "rawPropValue": "Pause Render",
       "parsedPropValue": "\"Pause Render\""
+    },
+    "-1242325535": {
+      "propKey": "select.javafx.class",
+      "rawPropValue": "Select JavaFX Class",
+      "parsedPropValue": "\"Select JavaFX Class\""
     },
     "-853393007": {
       "propKey": "classpath",

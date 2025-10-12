@@ -1,5 +1,6 @@
 package com.dsl.jfx_live_rendering.view_model;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent.Kind;
 import java.util.HashMap;
@@ -10,6 +11,8 @@ import java.util.Objects;
 
 import com.dsl.jfx_live_rendering.engine.Context;
 import com.dsl.jfx_live_rendering.engine.concurrent.ClassPathLoader;
+import com.dsl.jfx_live_rendering.engine.concurrent.PomDependencyResolver;
+import com.dsl.jfx_live_rendering.engine.impl.ExceptionHandlerImpl;
 import com.dsl.jfx_live_rendering.engine.impl.LoggerImpl;
 import com.dsl.jfx_live_rendering.engine.impl.WatchServiceImpl;
 import com.dsl.jfx_live_rendering.gui.ContentTab;
@@ -25,32 +28,45 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tab;
 
-public final class MainWindowViewModel implements ServiceConverter<List<Path>> {
+public final class MainWindowViewModel implements ServiceConverter<List<Path>>, FXUtils {
 
 	private Map<String, ContentTab> contentTabMap = new HashMap<>();
 
 	private ObjectProperty<ObservableList<Path>> javaFXClassList = new SimpleObjectProperty<>(FXCollections.observableArrayList());
 	private StringProperty log = new SimpleStringProperty();
 
-	// background service to load classpath files
-	private final Service<List<Path>> classPathLoaderService = toService(new ClassPathLoader());
-
-//	private ObjectProperty<ObservableList<Path>> pomDependenciesPathList = new SimpleObjectProperty<>(FXCollections.observableArrayList());
 	private ObjectProperty<Entry<Kind<Path>, List<Path>>> changedPathEntry = new SimpleObjectProperty<>();
+
+	Service<List<Path>> classPathLoaderService = Context.getService(ClassPathLoader.class);
+	Service<List<Path>> pomDependenciesLoaderService = Context.getService(PomDependencyResolver.class);
 
 	// session instance
 	private Session session = SessionManager.getInstance().getSession();
 
 	public MainWindowViewModel() {
 		new WatchServiceImpl().registerDirsAndStartWatch();
-		classPathLoaderService.setOnSucceeded(_ -> {
-			session.setJavaFXClassList(classPathLoaderService.getValue()); //TODO: reanalyze new classpath looking for javafx classes
-			setJavaFXClassListToProperty(session.getJavaFXClassList());
-		});
-		classPathLoaderService.setOnFailed(_ -> setLog("Failed to load classpath files: " + classPathLoaderService.getException().getMessage()));
 		setJavaFXClassListToProperty(session.getJavaFXClassList());
+
+		// stacking event handlers without overriding previous ones
+		classPathLoaderService.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, _ -> setJavaFXClassListToProperty(session.getJavaFXClassList()));
+		classPathLoaderService.addEventHandler(WorkerStateEvent.WORKER_STATE_RUNNING, _ -> {
+			Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+			alert.setTitle("Classpath Reloading Detected");
+			alert.setHeaderText("Classloader reloading detected. \nIt is recommended to select the pom.xml file corresponding to the new classloader. \n\nDo you want to select pom.xml again?");
+			alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+			if (alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {
+				File file = onFileChooserRequest(getClassPath());
+				if(file != null) {
+					setPomXMLPath(file.toPath());
+				}
+			}
+		});
 
 		// thread to update log property
 		Thread logConsumerThread = new Thread(() -> {
@@ -65,7 +81,7 @@ public final class MainWindowViewModel implements ServiceConverter<List<Path>> {
 				try {
 					setChangedPathEntry(Context.getChangedPathEntry());
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					ExceptionHandlerImpl.logException(e);
 				}
 			} while(Thread.currentThread().isAlive());
 		});
@@ -93,21 +109,6 @@ public final class MainWindowViewModel implements ServiceConverter<List<Path>> {
 	public void setJavaFXClassListToProperty(final List<Path> javaFXClassList) {
 		this.javaFXClassList.get().setAll(javaFXClassList);
 	}
-
-	/*
-	 * pomDependenciesPathList property methods
-	 */
-//	public ObjectProperty<ObservableList<Path>> pomDependenciesPathListProperty() {
-//		return this.pomDependenciesPathList;
-//	}
-//
-//	public ObservableList<Path> getPomDependenciesPathList() {
-//		return this.pomDependenciesPathList.get();
-//	}
-//
-//	public void setPomDependenciesPathList(final List<Path> pomDependenciesPathList) {
-//		this.pomDependenciesPathList.get().setAll(pomDependenciesPathList);
-//	}
 
 	/*
 	 * changedPathEntry property methods
@@ -166,6 +167,7 @@ public final class MainWindowViewModel implements ServiceConverter<List<Path>> {
 		getJavaFXClassListFromProperty().clear();
 	}
 
+	// get/set classPath
 	public Path getClassPath() {
 		return session.getClassPath();
 	}
@@ -175,11 +177,26 @@ public final class MainWindowViewModel implements ServiceConverter<List<Path>> {
 		classPathLoaderService.restart();
 	}
 
+	// get/set pom.xml path
+	public Path getPomXMLPath() {
+		return session.getPomXMLPath();
+	}
+
+	public void setPomXMLPath(Path pomXMLPath) {
+		session.setPomXMLPath(pomXMLPath);
+		pomDependenciesLoaderService.restart();
+	}
+
 	public Entry<Kind<Path>, List<ContentTab>> transformEntries() {
 		var entry = getChangedPathEntry();
 		List<ContentTab> tabs = entry.getValue().stream().map(ProcessedPathModel::new).toList().stream()
 				.map(ppm -> getContentTabFromMap(ppm.getFileName())).filter(Objects::nonNull)
 				.toList();
 		return Map.entry(entry.getKey(), tabs);
+	}
+
+	@Override
+	public Scene createScene() {
+		return null;
 	}
 }

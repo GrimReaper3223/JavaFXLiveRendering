@@ -11,6 +11,7 @@ public class RenderingEvents extends Event {
 	public static final EventType<RenderingEvents> LIVE_RENDERING_EVENT = new EventType<>(Event.ANY, "LIVE_RENDERING_EVENT");
 	public static final EventType<RenderingEvents> RENDERING_PAUSED_EVENT = new EventType<>(Event.ANY, "RENDERING_PAUSED_EVENT");
 	public static final EventType<RenderingEvents> RENDERING_UNPAUSED_EVENT = new EventType<>(Event.ANY, "RENDERING_UNPAUSED_EVENT");
+	public static final EventType<RenderingEvents> RENDERING_FORCED_EVENT = new EventType<>(Event.ANY, "RENDERING_FORCED_EVENT");
 	public static final EventType<RenderingEvents> RENDERING_ERROR_EVENT = new EventType<>(Event.ANY, "RENDERING_ERROR_EVENT");
 
 	public RenderingEvents(EventType<? extends RenderingEvents> eventType) {

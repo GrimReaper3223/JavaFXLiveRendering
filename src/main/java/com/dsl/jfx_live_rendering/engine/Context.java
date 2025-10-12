@@ -5,11 +5,15 @@ import java.nio.file.WatchEvent.Kind;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.SynchronousQueue;
+
+import javafx.concurrent.Service;
 
 public class Context {
 
 	private static final SynchronousQueue<Map.Entry<Kind<Path>, List<Path>>> syncChangedPathQueue = new SynchronousQueue<>();
+	private static final Map<Class<?>, Service<List<Path>>> serviceMap = new ConcurrentHashMap<>();
 
 	private Context() {}
 
@@ -22,5 +26,13 @@ public class Context {
 		while(iterator.hasNext()) {
 			syncChangedPathQueue.offer(iterator.next());
 		}
+	}
+
+	public static void registerService(Class<?> clazz, Service<List<Path>> service) {
+		serviceMap.put(clazz, service);
+	}
+
+	public static Service<List<Path>> getService(Class<?> clazz) {
+		return serviceMap.get(clazz);
 	}
 }
