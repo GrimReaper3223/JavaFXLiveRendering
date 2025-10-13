@@ -8,9 +8,10 @@ import com.dsl.jfx_live_rendering.gui.events.FileSystemEvents;
 import com.dsl.jfx_live_rendering.properties.generated.P;
 import com.dsl.jfx_live_rendering.view_model.StartWindowViewModel;
 
+import module javafx.base;
 import module javafx.controls;
 
-public class StartWindow extends BorderPane implements BorderPaneConfigHelper {
+public class StartWindow extends BorderPane implements BorderPaneConfigHelper, FXUtils {
 
 	// classpath texts
 	private Label classPathLabel = new Label(P.GuiText.CLASSPATH);
@@ -35,6 +36,19 @@ public class StartWindow extends BorderPane implements BorderPaneConfigHelper {
 
 	// view model
 	private StartWindowViewModel startWindowVM = new StartWindowViewModel();
+
+	// loading files dialog
+	private Dialog<Void> loadingDialog = createLoadingDialog();
+
+	// subscription
+	private final Subscription subscription = startWindowVM.getClassPathloaderService().runningProperty().or(startWindowVM.getPomModuleDependencyLoaderService().runningProperty()).subscribe((_, nv) -> {
+		if(nv) {
+			loadingDialog.show();
+		} else {
+			((Stage) loadingDialog.getDialogPane().getScene().getWindow()).close();
+			fireEvent(new FileSystemEvents(FileSystemEvents.INIT_COMPLETED_EVENT));
+		}
+	});
 
 	public StartWindow() {
 		setCenter(configCenter());
@@ -112,37 +126,10 @@ public class StartWindow extends BorderPane implements BorderPaneConfigHelper {
 			}
 		});
 		initButton.setOnAction(_ -> {
-			this.fireEvent(new FileSystemEvents(FileSystemEvents.INIT_REQUEST_EVENT));
-			Dialog<Void> loadingDialog = configureDialog();
-
-			/*
-			 * FIX: consertar este listener que abre a main window ao fim das tarefas.
-			 * Ele tambem controla o showing do loading dialog.
-			 * Como os servicos podem ser reiniciados a partir de outras telas, entao este listener
-			 * ainda funciona e acaba abrindo a main window novamente, mesmo que a partir de outra tela.
-			 *
-			 * TODO: Ideia: talvez a implementacao de event bus possa ajudar a resolver este problema.
-			 */
-			startWindowVM.getClassPathloaderService().runningProperty().or(startWindowVM.getPomModuleDependencyLoaderService().runningProperty()).addListener((_, _, nv) -> {
-				if(nv) {
-					loadingDialog.show();
-				} else {
-					((Stage) loadingDialog.getDialogPane().getScene().getWindow()).close();
-					Stage mainStage = new Stage();
-					mainStage.setScene(new MainWindow().createScene());
-					mainStage.setTitle(P.Metadata.APP_NAME);
-					mainStage.show();
-				}
-			});
+			fireEvent(new FileSystemEvents(FileSystemEvents.INIT_REQUEST_EVENT));
 			startWindowVM.init();
 		});
-	}
 
-	private Dialog<Void> configureDialog() {
-		Dialog<Void> loadingDialog = new Dialog<>();
-		Stage dialogStage = ((Stage) loadingDialog.getDialogPane().getScene().getWindow());
-		loadingDialog.setContentText("Resolving and loading files...");
-		dialogStage.setOnCloseRequest(_ -> dialogStage.close());
-		return loadingDialog;
+		addEventHandler(FileSystemEvents.INIT_COMPLETED_EVENT, _ -> subscription.unsubscribe());
 	}
 }

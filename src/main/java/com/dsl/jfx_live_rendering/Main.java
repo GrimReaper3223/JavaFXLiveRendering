@@ -1,5 +1,6 @@
 package com.dsl.jfx_live_rendering;
 
+import com.dsl.jfx_live_rendering.gui.MainWindow;
 import com.dsl.jfx_live_rendering.gui.StartWindow;
 import com.dsl.jfx_live_rendering.gui.events.FileSystemEvents;
 import com.dsl.jfx_live_rendering.properties.generated.P;
@@ -14,6 +15,12 @@ public class Main extends Application {
 		primaryStage.setScene(new StartWindow().createScene());
 		primaryStage.setTitle(P.Metadata.APP_NAME);
 		primaryStage.addEventHandler(FileSystemEvents.INIT_REQUEST_EVENT, _ -> primaryStage.close());
+		primaryStage.addEventHandler(FileSystemEvents.INIT_COMPLETED_EVENT, _ -> {
+			Stage mainStage = new Stage();
+			mainStage.setScene(new MainWindow().createScene());
+			mainStage.setTitle(P.Metadata.APP_NAME);
+			mainStage.show();
+		});
 		primaryStage.show();
 	}
 

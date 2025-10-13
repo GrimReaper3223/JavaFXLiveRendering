@@ -33,6 +33,14 @@ public interface FXUtils {
 		return dirChooser.showDialog(new Stage());
 	}
 
+	default Dialog<Void> createLoadingDialog() {
+		Dialog<Void> loadingDialog = new Dialog<>();
+		Stage dialogStage = ((Stage) loadingDialog.getDialogPane().getScene().getWindow());
+		loadingDialog.setContentText("Resolving dependencies and loading files...");
+		dialogStage.setOnCloseRequest(_ -> dialogStage.close());
+		return loadingDialog;
+	}
+
 	static ContentTab tabCast(Tab tab) {
 		return ContentTab.class.cast(tab);
 	}

@@ -10,16 +10,28 @@ import com.dsl.jfx_live_rendering.session_manager.SessionManager;
 
 public class PomDependencyResolver implements Callable<List<Path>> {
 
+	/*
+	 * TODO: adicionar posteriormente uma verificacao que checa se a variavel que detem a
+	 * home do maven esta configurada. Caso nao esteja, o servico nao lanca uma excecao.
+	 * Ele apenas nao achara o comando 'mvn' e retornara uma lista vazia.
+	 *
+	 * TODO: O depsFile deve fazer parte do diretorio da sessao atual carregada.
+	 */
 	@Override
 	public List<Path> call() throws Exception {
-		Path tempFilePath = Files.createTempFile("maven-deps", ".txt");
-		String cmd = String.format("cd %s; mvn dependency:build-classpath -Dmdep.outputFile=%s", SessionManager.getInstance().getSession().getPomXMLPath().getParent().toString(), tempFilePath);
-		ProcessBuilder pb = new ProcessBuilder("bash", "-c", cmd);
-		pb.start().waitFor();
+		Path depsFile = Path.of("deps.txt");
+		Files.deleteIfExists(depsFile);
+		Files.createFile(depsFile);
+		Process proc = new ProcessBuilder("bash", "-c", String.format("mvn dependency:build-classpath -Dmdep.outputFile=%s", depsFile))
+				.directory(SessionManager.getInstance().getSession().getPomXMLPath().getParent().toFile())
+				.inheritIO()
+				.start();
 
-		return Files.readAllLines(tempFilePath).stream()
-				.dropWhile(str -> str.contains("[INFO] Dependencies claspath:"))
-				.takeWhile(str -> !str.contains("--------------------"))
+		if (proc.waitFor() != 0) {
+			throw new RuntimeException("Failed to resolve dependencies using Maven.");
+		}
+
+		return Files.readAllLines(depsFile).stream()
 				.flatMap(str -> Arrays.asList(str.split(":")).stream())
 				.map(Path::of)
 				.toList();

@@ -13,6 +13,7 @@ public class FileSystemEvents extends Event {
 	public static final EventType<FileSystemEvents> POM_XML_LOAD_REQUEST_EVENT = new EventType<>(ANY, "POM_XML_LOAD_REQUEST_EVENT");
 	public static final EventType<FileSystemEvents> POM_XML_UNLOAD_REQUEST_EVENT = new EventType<>(ANY, "POM_XML_UNLOAD_REQUEST_EVENT");
 	public static final EventType<FileSystemEvents> INIT_REQUEST_EVENT = new EventType<>(ANY, "INIT_REQUEST_EVENT");
+	public static final EventType<FileSystemEvents> INIT_COMPLETED_EVENT = new EventType<>(ANY, "INIT_COMPLETED_EVENT");
 
 	public FileSystemEvents(EventType<FileSystemEvents> eventType) {
 		super(eventType);

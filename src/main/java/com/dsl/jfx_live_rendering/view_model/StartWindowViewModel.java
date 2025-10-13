@@ -29,6 +29,12 @@ public final class StartWindowViewModel implements ServiceConverter<List<Path>> 
 	public StartWindowViewModel() {
 		Context.registerService(ClassPathLoader.class, classPathLoaderService);
 		Context.registerService(PomDependencyResolver.class, pomDependenciesLoaderService);
+
+		// set service event handlers
+		classPathLoaderService.setOnSucceeded(_ -> session.setJavaFXClassList(classPathLoaderService.getValue()));
+		classPathLoaderService.setOnFailed(wst -> ExceptionHandlerImpl.logException(wst.getSource().getException()));
+		pomDependenciesLoaderService.setOnSucceeded(_ -> session.setPomDependenciesPathList(pomDependenciesLoaderService.getValue()));
+		pomDependenciesLoaderService.setOnFailed(wst -> ExceptionHandlerImpl.logException(wst.getSource().getException()));
 	}
 
 	/*
@@ -106,14 +112,9 @@ public final class StartWindowViewModel implements ServiceConverter<List<Path>> 
 	 * init method
 	 */
 	public void init() {
+		// set paths
 		session.setClassPath(getClassPath());
 		session.setPomXMLPath(getPomXMLPath());
-
-		// set service event handlers
-		classPathLoaderService.setOnSucceeded(_ -> session.setJavaFXClassList(classPathLoaderService.getValue()));
-		classPathLoaderService.setOnFailed(wst -> ExceptionHandlerImpl.logException(wst.getSource().getException()));
-		pomDependenciesLoaderService.setOnSucceeded(_ -> session.setPomDependenciesPathList(pomDependenciesLoaderService.getValue()));
-		pomDependenciesLoaderService.setOnFailed(wst -> ExceptionHandlerImpl.logException(wst.getSource().getException()));
 
 		// start services
 		classPathLoaderService.start();

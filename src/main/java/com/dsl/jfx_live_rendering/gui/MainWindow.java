@@ -2,11 +2,16 @@ package com.dsl.jfx_live_rendering.gui;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.controlsfx.control.HiddenSidesPane;
 
+import com.dsl.jfx_live_rendering.engine.Context;
+import com.dsl.jfx_live_rendering.engine.concurrent.ClassPathLoader;
+import com.dsl.jfx_live_rendering.engine.concurrent.PomDependencyResolver;
 import com.dsl.jfx_live_rendering.properties.generated.P;
 import com.dsl.jfx_live_rendering.view_model.MainWindowViewModel;
 
@@ -14,7 +19,7 @@ import module javafx.base;
 import module javafx.controls;
 import javafx.scene.control.TabPane.TabDragPolicy;
 
-public class MainWindow extends BorderPane implements BorderPaneConfigHelper {
+public class MainWindow extends BorderPane implements BorderPaneConfigHelper, FXUtils {
 
 	// top pane components (TOOLBAR)
 	private Text selectClassText = new Text(P.GuiText.SELECT_JAVAFX_CLASS);
@@ -41,6 +46,11 @@ public class MainWindow extends BorderPane implements BorderPaneConfigHelper {
 	private Label lastUpdatedLabel = new Label();
 
 	private MainWindowViewModel mainWindowVM = new MainWindowViewModel();
+	private Service<List<Path>> classPathLoaderService = Context.getService(ClassPathLoader.class);
+	private Service<List<Path>> pomDependenciesLoaderService = Context.getService(PomDependencyResolver.class);
+
+	// loading files dialog
+	private Dialog<Void> loadingDialog = createLoadingDialog();
 
 	public MainWindow() {
 		setTop(configTop());
@@ -160,7 +170,24 @@ public class MainWindow extends BorderPane implements BorderPaneConfigHelper {
 			File response = onDirectoryChooserRequest(mainWindowVM.getPomXMLPath());
 
 			if(response != null) {
-				mainWindowVM.setClassPath(response.toPath());
+				Subscription subscription = null;
+				Path responsePath = response.toPath();
+
+				Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+				alert.setTitle("Classpath Reloading Detected");
+				alert.setHeaderText("Classloader reloading detected. \nIt is recommended to select the pom.xml file corresponding to the new classloader. \n\nDo you want to select pom.xml again?");
+				alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+				if (alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {
+					File file = onFileChooserRequest(responsePath);
+					if(file != null) {
+						subscription = createSubscriber(classPathLoaderService.runningProperty(), pomDependenciesLoaderService.runningProperty());
+						mainWindowVM.setPomXMLPath(file.toPath());
+					}
+				} else {
+					subscription = createSubscriber(classPathLoaderService.runningProperty(), null);
+				}
+				mainWindowVM.setClassPath(responsePath);
+				subscription.unsubscribe();
 			}
 		});
 
@@ -227,5 +254,17 @@ public class MainWindow extends BorderPane implements BorderPaneConfigHelper {
 						sp.set("");
 					}
 				}));
+	}
+
+	private Subscription createSubscriber(ReadOnlyBooleanProperty p1, ReadOnlyBooleanProperty p2) {
+		Predicate<Boolean> instruction = val -> {
+			if (val) {
+				loadingDialog.show();
+			} else {
+				((Stage) loadingDialog.getDialogPane().getScene().getWindow()).close();
+			}
+			return val;
+		};
+		return p2 != null ? p1.or(p2).subscribe((_, nv) -> instruction.test(nv)) : p1.subscribe((_, nv) -> instruction.test(nv));
 	}
 }

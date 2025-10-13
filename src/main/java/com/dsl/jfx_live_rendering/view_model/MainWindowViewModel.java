@@ -1,6 +1,5 @@
 package com.dsl.jfx_live_rendering.view_model;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent.Kind;
 import java.util.HashMap;
@@ -21,18 +20,8 @@ import com.dsl.jfx_live_rendering.models.ProcessedPathModel;
 import com.dsl.jfx_live_rendering.session_manager.Session;
 import com.dsl.jfx_live_rendering.session_manager.SessionManager;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.concurrent.Service;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Tab;
+import module javafx.base;
+import module javafx.controls;
 
 public final class MainWindowViewModel implements ServiceConverter<List<Path>>, FXUtils {
 
@@ -55,18 +44,6 @@ public final class MainWindowViewModel implements ServiceConverter<List<Path>>, 
 
 		// stacking event handlers without overriding previous ones
 		classPathLoaderService.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, _ -> setJavaFXClassListToProperty(session.getJavaFXClassList()));
-		classPathLoaderService.addEventHandler(WorkerStateEvent.WORKER_STATE_RUNNING, _ -> {
-			Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-			alert.setTitle("Classpath Reloading Detected");
-			alert.setHeaderText("Classloader reloading detected. \nIt is recommended to select the pom.xml file corresponding to the new classloader. \n\nDo you want to select pom.xml again?");
-			alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
-			if (alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {
-				File file = onFileChooserRequest(getClassPath());
-				if(file != null) {
-					setPomXMLPath(file.toPath());
-				}
-			}
-		});
 
 		// thread to update log property
 		Thread logConsumerThread = new Thread(() -> {
