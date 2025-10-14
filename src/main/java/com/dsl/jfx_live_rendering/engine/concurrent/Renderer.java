@@ -26,17 +26,10 @@ public class Renderer implements Callable<Node> {
 	@Override
 	public Node call() throws Exception {
 		Path classpath = sessionInstance.getClassPath();
-		ModuleFinder applicationModuleFinder = ModuleFinder.of(classpath);
-		ModuleFinder dependenciesFinder = ModuleFinder.of(sessionInstance.getPomDependenciesPathList().toArray(Path[]::new));
-		ModuleFinder composedFinder = ModuleFinder.compose(applicationModuleFinder, dependenciesFinder);
-
-		String applicationModuleName = applicationModuleFinder.findAll().stream()
-				.map(moduleRef -> moduleRef.descriptor().name())
-				.findFirst()
-				.orElseThrow();
+		String applicationModuleName = sessionInstance.getApplicationModuleName();
 
 		ModuleLayer layer = ModuleLayer.boot();
-		Configuration config = layer.configuration().resolve(composedFinder, ModuleFinder.of(), Set.of(applicationModuleName));
+		Configuration config = layer.configuration().resolve(sessionInstance.getComposedFinder(), ModuleFinder.of(), Set.of(applicationModuleName));
 		ClassLoader cl = layer.defineModulesWithOneLoader(config, new CustomURLClassLoader(classpath.toUri().toURL())).findLoader(applicationModuleName);
 		FXMLLoader.setDefaultClassLoader(cl);
 		Class<?> cls = cl.loadClass(binaryClassName);

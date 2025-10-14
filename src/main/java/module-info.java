@@ -9,4 +9,5 @@ module javaFXLiveRendering {
 
     exports com.dsl.jfx_live_rendering;
     exports com.dsl.jfx_live_rendering.properties.generated;
+    opens com.dsl.jfx_live_rendering.session_manager to javafx.base;
 }

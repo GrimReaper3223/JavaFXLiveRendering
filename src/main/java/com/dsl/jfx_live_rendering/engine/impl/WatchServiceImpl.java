@@ -47,6 +47,7 @@ public class WatchServiceImpl {
 		return (WatchEvent<T>) event;
 	}
 
+	// TODO: verificar se podemos inserir o evento ENTRY_CREATE
 	private void register() {
 		SessionManager.getInstance().getSession().getJavaFXClassList().forEach(filePath -> {
 			try {

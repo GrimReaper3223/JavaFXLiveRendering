@@ -1,17 +1,21 @@
 package com.dsl.jfx_live_rendering.gui;
 
 import java.io.File;
+import java.util.function.Supplier;
 
 import org.controlsfx.control.HyperlinkLabel;
 
 import com.dsl.jfx_live_rendering.gui.events.FileSystemEvents;
 import com.dsl.jfx_live_rendering.properties.generated.P;
+import com.dsl.jfx_live_rendering.session_manager.Session;
 import com.dsl.jfx_live_rendering.view_model.StartWindowViewModel;
 
 import module javafx.base;
 import module javafx.controls;
 
 public class StartWindow extends BorderPane implements BorderPaneConfigHelper, FXUtils {
+
+	private Supplier<Region> regionSupplier = Region::new;
 
 	// classpath texts
 	private Label classPathLabel = new Label(P.GuiText.CLASSPATH);
@@ -34,6 +38,11 @@ public class StartWindow extends BorderPane implements BorderPaneConfigHelper, F
 	private Text appVersionText = new Text(String.format("%s %s", P.Metadata.APP_NAME, P.Metadata.APP_VERSION));
 	private HyperlinkLabel authorLink = new HyperlinkLabel(String.format("%s - [%s]", P.Metadata.APP_AUTHOR, P.Metadata.APP_HOMEPAGE));
 
+	// left components
+	private ListView<Session> listView = new ListView<>();
+	private Button clearSelection = new Button("Clear Selection");
+	private Button deleteSelection = new Button("Delete Selection");
+
 	// view model
 	private StartWindowViewModel startWindowVM = new StartWindowViewModel();
 
@@ -51,15 +60,42 @@ public class StartWindow extends BorderPane implements BorderPaneConfigHelper, F
 	});
 
 	public StartWindow() {
-		setCenter(configCenter());
 		setBottom(configBottom());
+		setLeft(configLeft());
+		setCenter(configCenter());
 		setupActions();
 	}
 
 	@Override
 	public Scene createScene() {
-		var screenBounds = Screen.getPrimary().getVisualBounds();
+		Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
 		return new Scene(this, screenBounds.getWidth() / 2, screenBounds.getHeight() / 2);
+	}
+
+	@Override
+	public Node configLeft() {
+		listView.setCellFactory(_ -> new ListCell<Session>() {
+			@Override
+			protected void updateItem(Session item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(null);
+				setGraphic(null);
+
+				if(!empty && item != null) {
+					setText(item.getApplicationModuleName());
+				}
+			};
+		});
+
+		Region spacer = regionSupplier.get();
+		HBox buttonBox = new HBox(clearSelection, spacer, deleteSelection);
+		VBox box = new VBox(listView, buttonBox);
+		box.setPadding(new Insets(10, 0, 0, 10));
+		box.setSpacing(10);
+
+		HBox.setHgrow(spacer, Priority.SOMETIMES);
+		startWindowVM.loadSessions();
+		return box;
 	}
 
 	@Override
@@ -91,7 +127,7 @@ public class StartWindow extends BorderPane implements BorderPaneConfigHelper, F
 
 	@Override
 	public Node configBottom() {
-		Region spacer = new Region();
+		Region spacer = regionSupplier.get();
 
 		HBox infoBox = new HBox(appVersionText, spacer, authorLink);
 		HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -110,7 +146,29 @@ public class StartWindow extends BorderPane implements BorderPaneConfigHelper, F
 		pomXMLPathText.textProperty().bind(startWindowVM.pomXMLPathProperty().asString());
 //		pomXMLPathCheckingStatusText.textProperty().bind(startWindowVM.pomXMLCheckingStatusProperty());
 
+		// listView bind
+		listView.itemsProperty().bind(startWindowVM.sessionListProperty());
+		listView.visibleProperty().bind(startWindowVM.sessionListProperty().isNotEqualTo(FXCollections.observableArrayList()));
+		listView.managedProperty().bind(listView.visibleProperty());
+		listView.getSelectionModel().selectedItemProperty().addListener((_, _, nv) -> {
+			if(nv != null) {
+				startWindowVM.setClassPath(nv.getClassPath());
+				startWindowVM.setPomXMLPath(nv.getPomXMLPath());
+			}
+		});
+
+		clearSelection.managedProperty().bind(listView.visibleProperty());
+		clearSelection.visibleProperty().bind(listView.visibleProperty());
+		deleteSelection.managedProperty().bind(listView.visibleProperty());
+		deleteSelection.visibleProperty().bind(listView.visibleProperty());
+
 		// button actions
+		clearSelection.setOnAction(_ -> listView.getSelectionModel().clearSelection());
+		deleteSelection.setOnAction(_ -> {
+			Session session = listView.getSelectionModel().getSelectedItem();
+			startWindowVM.deleteSessionFile(session);
+			listView.getItems().remove(session);
+		});
 		setClassPathButton.setOnAction(_ -> {
 			File response = onDirectoryChooserRequest(startWindowVM.getPomXMLPath());
 
@@ -127,9 +185,12 @@ public class StartWindow extends BorderPane implements BorderPaneConfigHelper, F
 		});
 		initButton.setOnAction(_ -> {
 			fireEvent(new FileSystemEvents(FileSystemEvents.INIT_REQUEST_EVENT));
-			startWindowVM.init();
+			startWindowVM.init(listView.getSelectionModel().getSelectedItem());
 		});
 
-		addEventHandler(FileSystemEvents.INIT_COMPLETED_EVENT, _ -> subscription.unsubscribe());
+		addEventHandler(FileSystemEvents.INIT_COMPLETED_EVENT, _ -> {
+			subscription.unsubscribe();
+			startWindowVM.defineSessionModuleFinders();
+		});
 	}
 }

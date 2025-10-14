@@ -23,6 +23,6 @@ public class ExceptionHandlerImpl {
 		}
 		String trace = getStackTrace(throwable);
 		LoggerImpl.log(trace);
-		IO.println(trace);
+		IO.println(trace);	// NOTE: remover ao fim da depuracao
 	}
 }
