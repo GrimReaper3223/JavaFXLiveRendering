@@ -1,24 +1,17 @@
 package com.dsl.jfx_live_rendering.engine.impl;
 
-import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
-import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
+import com.dsl.jfx_live_rendering.engine.Context;
+import com.dsl.jfx_live_rendering.session_manager.SessionManager;
 
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.WatchEvent;
+import java.nio.file.*;
 import java.nio.file.WatchEvent.Kind;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.dsl.jfx_live_rendering.engine.Context;
-import com.dsl.jfx_live_rendering.session_manager.SessionManager;
+import static java.nio.file.StandardWatchEventKinds.*;
 
 public class WatchServiceImpl {
 
@@ -56,11 +49,10 @@ public class WatchServiceImpl {
 
 				if (keyMap.computeIfPresent(key, (_, _) -> dir) != null) {
 					LoggerImpl.log(String.format("Directory '%s' has updated successfully.", dir.getFileName().toString()));
-				} else if (keyMap.computeIfAbsent(key, _ -> dir) != null) {
-					LoggerImpl.log(String.format("Directory '%s' has registered successfully.", dir.getFileName().toString()));
 				} else {
-					LoggerImpl.log("** BUG ON DIRECTORY REGISTER (Watch Service) **: No action performed.");
-				}
+                    keyMap.computeIfAbsent(key, _ -> dir);
+                    LoggerImpl.log(String.format("Directory '%s' has registered successfully.", dir.getFileName().toString()));
+                }
 			} catch (IOException e) {
 				ExceptionHandlerImpl.logException(e);
 			}

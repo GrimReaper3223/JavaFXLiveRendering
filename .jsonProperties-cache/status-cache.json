@@ -1,8 +1,13 @@
 {
   "filePath": "src/main/resources/values/strings/status.properties",
-  "fileHash": 1310452119,
+  "fileHash": 1979437488,
   "javaType": "java.lang.String",
   "entries": {
+    "1914706913": {
+      "propKey": "session.pom.xml.override",
+      "rawPropValue": "WARNING: Pom.xml of session %s is being changed. When you click Init, the pom.xml path will be updated.",
+      "parsedPropValue": "\"WARNING: Pom.xml of session %s is being changed. When you click Init, the pom.xml path will be updated.\""
+    },
     "-1076614697": {
       "propKey": "rendering.error",
       "rawPropValue": "Status: Rendering Error",
@@ -12,6 +17,11 @@
       "propKey": "analyzing.classpath",
       "rawPropValue": "Analyzing class path...",
       "parsedPropValue": "\"Analyzing class path...\""
+    },
+    "-755108843": {
+      "propKey": "session.pom.xml.new",
+      "rawPropValue": "NOTE: A new session will be created with pom.xml %s.",
+      "parsedPropValue": "\"NOTE: A new session will be created with pom.xml %s.\""
     },
     "-1465994795": {
       "propKey": "error.javafx.subclass.not.founded",
@@ -37,6 +47,16 @@
       "propKey": "rendering.live",
       "rawPropValue": "Status: Live Rendering",
       "parsedPropValue": "\"Status: Live Rendering\""
+    },
+    "-1597980656": {
+      "propKey": "session.classpath.override",
+      "rawPropValue": "WARNING: ClassPath of session %s is being changed. When you click Init, the classpath will be updated.",
+      "parsedPropValue": "\"WARNING: ClassPath of session %s is being changed. When you click Init, the classpath will be updated.\""
+    },
+    "1937220326": {
+      "propKey": "session.classpath.new",
+      "rawPropValue": "NOTE: A new session will be created with the classpath %s.",
+      "parsedPropValue": "\"NOTE: A new session will be created with the classpath %s.\""
     },
     "880712079": {
       "propKey": "loaded.class",

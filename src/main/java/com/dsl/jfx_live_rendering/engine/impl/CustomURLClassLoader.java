@@ -16,7 +16,7 @@ public class CustomURLClassLoader extends URLClassLoader {
 			try {
 				c = findClass(name);
 			} catch (ClassNotFoundException _) {
-				// not found in this classloader, delegate to parent
+				// not found in this class loader, delegate to parent
 				c = super.loadClass(name, resolve);
 			}
 		}

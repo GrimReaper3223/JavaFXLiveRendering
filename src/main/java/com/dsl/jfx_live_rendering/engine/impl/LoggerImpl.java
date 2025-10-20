@@ -10,7 +10,7 @@ public class LoggerImpl {
 	private LoggerImpl() {}
 
 	public static void log(String log) {
-		LOG_BUFFER.offer(log);
+		LOG_BUFFER.add(log);
 	}
 
 	public static String getLog() {

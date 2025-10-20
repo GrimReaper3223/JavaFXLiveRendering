@@ -1,59 +1,58 @@
 package com.dsl.jfx_live_rendering.gui;
 
-import java.nio.file.Path;
-
+import module javafx.controls;
 import com.dsl.jfx_live_rendering.engine.concurrent.Renderer;
 import com.dsl.jfx_live_rendering.engine.impl.ExceptionHandlerImpl;
 import com.dsl.jfx_live_rendering.engine.impl.LoggerImpl;
+import com.dsl.jfx_live_rendering.gui.events.RenderingEvents;
 import com.dsl.jfx_live_rendering.models.ProcessedPathModel;
 import com.dsl.jfx_live_rendering.properties.generated.P;
 import com.dsl.jfx_live_rendering.view_model.ServiceConverter;
 
-import module javafx.base;
-import module javafx.controls;
+import java.nio.file.Path;
+import java.util.Optional;
 
 public class ContentTab extends Tab implements ServiceConverter<Node> {
 
-	private ObjectProperty<TabRenderingState> tabRenderingState = new SimpleObjectProperty<>(TabRenderingState.IDLE);
+	private final ObjectProperty<TabRenderingState> tabRenderingState = new SimpleObjectProperty<>(TabRenderingState.IDLE);
 
-	private StringProperty status = new SimpleStringProperty();
-	private StringProperty loadedClass = new SimpleStringProperty();
-	private StringProperty lastUpdated = new SimpleStringProperty();
+    private final StackPane pane = new StackPane();
 
-	private Service<Node> renderingService;
+	private final StringProperty status = new SimpleStringProperty();
+	private final StringProperty loadedClass = new SimpleStringProperty();
+	private final StringProperty lastUpdated = new SimpleStringProperty();
+
+	private final Service<Node> renderingService;
 	private final String className;
+    private final ProcessedPathModel ppm;
 
 	public ContentTab(Path file) {
-		ProcessedPathModel ppm = new ProcessedPathModel(file);
-		super(ppm.getFileName());
-		this.className = ppm.getFileName();
+        // instance setup
+		ppm = new ProcessedPathModel(file);
+		className = ppm.getFileName();
 
-		StackPane pane = new StackPane();
+        // pane setup
 		pane.setPadding(new Insets(10));
 
+        // service setup
 		renderingService = toService(new Renderer(ppm.getBinaryFileName()));
-		renderingService.setOnSucceeded(this::onLiveRendering);
-		renderingService.setOnFailed(this::onErrorRendering);
-		renderingService.valueProperty().addListener((_, _, nv) -> {
-			var children = pane.getChildren();
-			if(nv != null) {
-                children.setAll(nv);
-            } else {
-            	children.clear();
-            }
-		});
+        configureService();
+
+        // tabRenderingState setup
 		tabRenderingState.addListener((_, _, nv) -> {
 			setStatus(nv.getStateDescription());
 			setLoadedClass("%s %s".formatted(P.Status.LOADED_CLASS, this.className));
 			setLastUpdated(nv.getLastUpdatedDescription());
 		});
+
+        setText(className);
 		setContent(pane);
 		runService();
 	}
 
 	public void runService() {
 		if (!tabRenderingState.get().equals(TabRenderingState.PAUSED_RENDERING)) {
-			Platform.runLater(() -> renderingService.restart());
+			Platform.runLater(renderingService::restart);
 		}
 	}
 
@@ -110,38 +109,58 @@ public class ContentTab extends Tab implements ServiceConverter<Node> {
 		return lastUpdated;
 	}
 
-	public void onForceRendering() {
-		LoggerImpl.log(String.format("Forced reload for tab '%s' requested.", className));
-		tabRenderingState.set(TabRenderingState.FORCED_RENDERING);
-		Platform.runLater(() -> renderingService.restart());
-	}
+    /*
+     * ProcessedPathModel getter
+     */
+    public ProcessedPathModel getPpm() {
+        return ppm;
+    }
 
-	public void onLiveRendering(WorkerStateEvent wse) {
-		if(!getTabRenderingState().equals(TabRenderingState.PAUSED_RENDERING)) {
-			LoggerImpl.log(String.format("'%s' tab is now rendering live.", className));
-			tabRenderingState.set(TabRenderingState.LIVE_RENDERING);
-		}
-	}
+    private void configureService() {
+        renderingService.setOnSucceeded(_ -> onRendering(new RenderingEvents(RenderingEvents.LIVE_RENDERING_EVENT, this)));
+        renderingService.setOnFailed(_ -> onRendering(new RenderingEvents(RenderingEvents.RENDERING_ERROR_EVENT, this)));
+        renderingService.valueProperty().addListener((_, _, nv) -> {
+            var children = pane.getChildren();
+            Optional.ofNullable(nv).ifPresentOrElse(children::setAll, children::clear);
+        });
+    }
 
-	public void onPauseRendering() {
-		if(getTabRenderingState().equals(TabRenderingState.LIVE_RENDERING)) {
-    		LoggerImpl.log("'%s' tab has had its rendering suspended.".formatted(className));
-    		tabRenderingState.set(TabRenderingState.PAUSED_RENDERING);
-		}
-	}
+    public void onRendering(RenderingEvents event) {
+        switch(event.getEventType().getName()) {
+            case "LIVE_RENDERING_EVENT" -> {
+                if(!getTabRenderingState().equals(TabRenderingState.PAUSED_RENDERING)) {
+                    LoggerImpl.log(String.format("'%s' tab is now rendering live.", className));
+                    tabRenderingState.set(TabRenderingState.LIVE_RENDERING);
+                }
+            }
+            case "RENDERING_PAUSED_EVENT" -> {
+                if(getTabRenderingState().equals(TabRenderingState.LIVE_RENDERING)) {
+                    LoggerImpl.log("'%s' tab has had its rendering suspended.".formatted(className));
+                    tabRenderingState.set(TabRenderingState.PAUSED_RENDERING);
+                }
+            }
+            case "RENDERING_UNPAUSED_EVENT" -> {
+                if(getTabRenderingState().equals(TabRenderingState.PAUSED_RENDERING)) {
+                    LoggerImpl.log("Tab '%s' has unpaused rendering. Updating content...".formatted(className));
+                    tabRenderingState.set(TabRenderingState.UNPAUSED_RENDERING);
+                    runService();
+                }
+            }
+            case "RENDERING_FORCED_EVENT" -> {
+                LoggerImpl.log(String.format("Forced reload for tab '%s' requested.", className));
+                tabRenderingState.set(TabRenderingState.IDLE);
+                runService();
+            }
+            case "RENDERING_ERROR_EVENT" -> {
+                LoggerImpl.log("An error has occurred when trying render '%s' tab.".formatted(className));
+                ExceptionHandlerImpl.logException(renderingService.getException());
+                tabRenderingState.set(TabRenderingState.ERROR_RENDERING);
+                renderingService.reset();
+            }
+        }
 
-	public void onUnpauseRendering() {
-		if(getTabRenderingState().equals(TabRenderingState.PAUSED_RENDERING)) {
-			LoggerImpl.log("Tab '%s' has unpaused rendering. Updating content...".formatted(className));
-			tabRenderingState.set(TabRenderingState.UNPAUSED_RENDERING);
-			runService();
-		}
-	}
-
-	public void onErrorRendering(WorkerStateEvent wse) {
-		LoggerImpl.log("An error has occurred when trying render '%s' tab.".formatted(className));
-		ExceptionHandlerImpl.logException(wse.getSource().getException());
-		tabRenderingState.set(TabRenderingState.ERROR_RENDERING);
-		renderingService.reset();
-	}
+        if(event.getContentTab() == null) {
+            event.setContentTab(this);
+        }
+    }
 }

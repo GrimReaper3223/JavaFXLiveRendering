@@ -1,27 +1,28 @@
-package com.dsl.jfx_live_rendering.gui;
+package com.dsl.jfx_live_rendering.gui.commons;
+
+import module javafx.controls;
+import com.dsl.jfx_live_rendering.properties.generated.P;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.function.Predicate;
 
-import com.dsl.jfx_live_rendering.properties.generated.P;
-
-import module javafx.controls;
-
 public interface FXUtils {
 
 	final Predicate<Path> isValidDirectory = path -> path != null && !path.toString().isEmpty();
 
-	Scene createScene();
+	default Scene createScene() { return null; }
 	default void setupActions() {}
 
-	default Border createBorder(Color color, CornerRadii cr) {
+	static Border createBorder(Color color, CornerRadii cr) {
 		return new Border(new BorderStroke(color == null ? Color.LIGHTGRAY : color, BorderStrokeStyle.SOLID,cr == null ? CornerRadii.EMPTY : cr, BorderWidths.DEFAULT));
 	}
 
 	default File onFileChooserRequest(Path classPathInitialDirectory) {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setInitialDirectory(isValidDirectory.test(classPathInitialDirectory) ? classPathInitialDirectory.getParent().toFile() : Path.of(System.getProperty("user.home")).toFile());
+		fileChooser.setSelectedExtensionFilter(new ExtensionFilter("pom.xml file", "pom.xml"));
 		fileChooser.setTitle(P.GuiText.SET_POMPATH);
 		return fileChooser.showOpenDialog(new Stage());
 	}
@@ -39,9 +40,5 @@ public interface FXUtils {
 		loadingDialog.setContentText("Resolving dependencies and loading files...");
 		dialogStage.setOnCloseRequest(_ -> dialogStage.close());
 		return loadingDialog;
-	}
-
-	static ContentTab tabCast(Tab tab) {
-		return ContentTab.class.cast(tab);
 	}
 }

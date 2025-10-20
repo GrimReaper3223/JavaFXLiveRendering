@@ -1,5 +1,9 @@
 package com.dsl.jfx_live_rendering.engine.io;
 
+import com.dsl.jfx_live_rendering.engine.impl.ExceptionHandlerImpl;
+import com.dsl.jfx_live_rendering.session_manager.Session;
+import com.dsl.jfx_live_rendering.session_manager.SessionManager;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -7,10 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
-
-import com.dsl.jfx_live_rendering.engine.impl.ExceptionHandlerImpl;
-import com.dsl.jfx_live_rendering.session_manager.Session;
-import com.dsl.jfx_live_rendering.session_manager.SessionManager;
 
 public class SessionRWOperations {
 
@@ -30,7 +30,7 @@ public class SessionRWOperations {
 
 	public Session read(Path path) throws IOException, ClassNotFoundException {
 		try(ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(path))) {
-			return Session.class.cast(ois.readObject());
+			return (Session) ois.readObject();
 		}
 	}
 

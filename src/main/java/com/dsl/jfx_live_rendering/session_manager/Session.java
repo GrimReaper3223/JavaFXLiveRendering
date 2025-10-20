@@ -1,28 +1,26 @@
 package com.dsl.jfx_live_rendering.session_manager;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.*;
 import java.lang.module.ModuleFinder;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class Session implements Externalizable {
 
-	private static final long serialVersionUID = 1L;
+	@Serial
+    private static final long serialVersionUID = 1L;
 
 	private String applicationModuleName;
 
-	private Path classPath;
-	private Path pomXMLPath;
-	private List<Path> javaFXClassList;
-	private List<Path> pomDependenciesPathList;
+	private transient Path classPath;
+	private transient Path pomXMLPath;
+	private transient List<Path> javaFXClassList;
+	private transient List<Path> pomDependenciesPathList;
 
-	private ModuleFinder applicationModuleFinder;
-	private ModuleFinder dependenciesFinder;
-	private ModuleFinder composedFinder;
+	private transient ModuleFinder applicationModuleFinder;
+	private transient ModuleFinder dependenciesFinder;
+	private transient ModuleFinder composedFinder;
 
 	public Session() {}
 
@@ -122,7 +120,7 @@ public class Session implements Externalizable {
 		this.applicationModuleName = in.readUTF();
 		this.classPath = Path.of(in.readUTF());
 		this.pomXMLPath = Path.of(in.readUTF());
-		this.javaFXClassList = Arrays.asList(in.readObject()).stream().map(Object::toString).map(Path::of).toList();
-		this.pomDependenciesPathList = Arrays.asList(in.readObject()).stream().map(Object::toString).map(Path::of).toList();
+		this.javaFXClassList = Stream.of(in.readObject()).map(Object::toString).map(Path::of).toList();
+		this.pomDependenciesPathList = Stream.of(in.readObject()).map(Object::toString).map(Path::of).toList();
 	}
 }

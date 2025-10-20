@@ -1,6 +1,12 @@
 package com.dsl.jfx_live_rendering.engine.concurrent;
 
-import java.io.IOException;
+import com.dsl.jfx_live_rendering.engine.impl.CustomURLClassLoader;
+import com.dsl.jfx_live_rendering.engine.impl.ExceptionHandlerImpl;
+import com.dsl.jfx_live_rendering.models.ProcessedPathModel;
+import com.dsl.jfx_live_rendering.session_manager.SessionManager;
+import javafx.scene.Node;
+import org.jetbrains.annotations.NotNull;
+
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,13 +15,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-
-import com.dsl.jfx_live_rendering.engine.impl.CustomURLClassLoader;
-import com.dsl.jfx_live_rendering.engine.impl.ExceptionHandlerImpl;
-import com.dsl.jfx_live_rendering.models.ProcessedPathModel;
-import com.dsl.jfx_live_rendering.session_manager.SessionManager;
-
-import javafx.scene.Node;
 
 public class ClassPathLoader implements Callable<List<Path>> {
 
@@ -27,9 +26,9 @@ public class ClassPathLoader implements Callable<List<Path>> {
     	Path classPath = SessionManager.getInstance().getSession().getClassPath();
     	cl = new CustomURLClassLoader(classPath.toUri().toURL());
 
-		Files.walkFileTree(classPath, new SimpleFileVisitor<Path>() {
-			@Override
-			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+		Files.walkFileTree(classPath, new SimpleFileVisitor<>() {
+            @Override
+			public @NotNull FileVisitResult visitFile(@NotNull Path file, @NotNull BasicFileAttributes attrs) {
 				try {
 					if(classNodeValidator(file)) {
 						files.add(file);

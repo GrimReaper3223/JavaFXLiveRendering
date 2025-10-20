@@ -1,22 +1,18 @@
 package com.dsl.jfx_live_rendering.engine.concurrent;
 
+import com.dsl.jfx_live_rendering.engine.impl.ExceptionHandlerImpl;
+import com.dsl.jfx_live_rendering.session_manager.SessionManager;
+
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
-
-import com.dsl.jfx_live_rendering.session_manager.SessionManager;
+import java.util.stream.Collectors;
 
 public class PomDependencyResolver implements Callable<List<Path>> {
 
-	/*
-	 * TODO: adicionar posteriormente uma verificacao que checa se a variavel que detem a
-	 * home do maven esta configurada. Caso nao esteja, o servico nao lanca uma excecao.
-	 * Ele apenas nao achara o comando 'mvn' e retornara uma lista vazia.
-	 *
-	 * TODO: O depsFile deve fazer parte do diretorio da sessao atual carregada.
-	 */
 	@Override
 	public List<Path> call() throws Exception {
 		Path depsFile = Path.of("deps.txt");
@@ -28,12 +24,19 @@ public class PomDependencyResolver implements Callable<List<Path>> {
 				.start();
 
 		if (proc.waitFor() != 0) {
-			throw new RuntimeException("Failed to resolve dependencies using Maven.");
+			throw new IOException("Failed to resolve dependencies using Maven. Verify that the environment variables required to run MVN command are set correctly.");
 		}
 
-		return Files.readAllLines(depsFile).stream()
-				.flatMap(str -> Arrays.asList(str.split(":")).stream())
-				.map(Path::of)
-				.toList();
-	}
+        return Files.readAllLines(depsFile).stream()
+                .flatMap(str -> Arrays.stream(str.split(":")))
+                .map(Path::of)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
+                    try {
+                        Files.delete(depsFile);
+                    } catch (IOException e) {
+                        ExceptionHandlerImpl.logException(e);
+                    }
+                    return list;
+                }));
+    }
 }

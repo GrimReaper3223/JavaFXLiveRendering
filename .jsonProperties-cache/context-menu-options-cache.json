@@ -1,0 +1,12 @@
+{
+  "filePath": "src/main/resources/values/strings/menu/context-menu-options.properties",
+  "fileHash": 831237646,
+  "javaType": "java.lang.String",
+  "entries": {
+    "1441654161": {
+      "propKey": "context.menu.delete",
+      "rawPropValue": "Delete",
+      "parsedPropValue": "\"Delete\""
+    }
+  }
+}

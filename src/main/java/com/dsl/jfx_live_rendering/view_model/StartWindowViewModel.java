@@ -1,39 +1,44 @@
 package com.dsl.jfx_live_rendering.view_model;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-
 import com.dsl.jfx_live_rendering.engine.Context;
 import com.dsl.jfx_live_rendering.engine.concurrent.ClassPathLoader;
 import com.dsl.jfx_live_rendering.engine.concurrent.PomDependencyResolver;
 import com.dsl.jfx_live_rendering.engine.impl.ExceptionHandlerImpl;
 import com.dsl.jfx_live_rendering.session_manager.Session;
 import com.dsl.jfx_live_rendering.session_manager.SessionManager;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 
-public final class StartWindowViewModel implements ServiceConverter<List<Path>> {
+import java.io.File;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
 
-	private ObjectProperty<Path> classPath = new SimpleObjectProperty<>(Path.of(""));
-	private ObjectProperty<Path> pomXMLPath = new SimpleObjectProperty<>(Path.of(""));
-	private ObjectProperty<ObservableList<Session>> sessionList = new SimpleObjectProperty<>(FXCollections.observableArrayList());
+public class StartWindowViewModel implements ServiceConverter<List<Path>> {
+
+	private final ObjectProperty<Path> classPath = new SimpleObjectProperty<>(Path.of(""));
+	private final ObjectProperty<Path> pomXMLPath = new SimpleObjectProperty<>(Path.of(""));
+	private final ObjectProperty<ObservableList<Session>> sessionList = new SimpleObjectProperty<>(FXCollections.observableArrayList());
 //	private StringProperty classPathCheckingStatus = new SimpleStringProperty();
 //	private StringProperty pomXMLCheckingStatus = new SimpleStringProperty();
 
-	private Service<List<Path>> classPathLoaderService = toService(new ClassPathLoader());
-	private Service<List<Path>> pomDependenciesLoaderService = toService(new PomDependencyResolver());
+	private final Service<List<Path>> classPathLoaderService = toService(new ClassPathLoader());
+	private final Service<List<Path>> pomDependenciesLoaderService = toService(new PomDependencyResolver());
 
-	private SessionManager sessionManager = SessionManager.getInstance();
+	private final SessionManager sessionManager = SessionManager.getInstance();
 
 	public StartWindowViewModel() {
 		Context.registerService(ClassPathLoader.class, classPathLoaderService);
 		Context.registerService(PomDependencyResolver.class, pomDependenciesLoaderService);
+
+		// set service event handlers
+		classPathLoaderService.setOnSucceeded(_ -> sessionManager.getSession().setJavaFXClassList(classPathLoaderService.getValue()));
+		classPathLoaderService.setOnFailed(wst -> ExceptionHandlerImpl.logException(wst.getSource().getException()));
+		pomDependenciesLoaderService.setOnSucceeded(_ -> sessionManager.getSession().setPomDependenciesPathList(pomDependenciesLoaderService.getValue()));
+		pomDependenciesLoaderService.setOnFailed(wst -> ExceptionHandlerImpl.logException(wst.getSource().getException()));
 	}
 
 	/*
@@ -47,8 +52,8 @@ public final class StartWindowViewModel implements ServiceConverter<List<Path>> 
 		return this.classPathProperty().get();
 	}
 
-	public void setClassPath(final Path classPath) {
-		this.classPathProperty().set(classPath);
+	public <T> void setClassPath(final T classPath) {
+		this.classPathProperty().set(Path.of(classPath.toString()));
 	}
 
 	/*
@@ -62,8 +67,8 @@ public final class StartWindowViewModel implements ServiceConverter<List<Path>> 
 		return this.pomXMLPathProperty().get();
 	}
 
-	public void setPomXMLPath(final Path pomXMLPath) {
-		this.pomXMLPathProperty().set(pomXMLPath);
+	public <T> void setPomXMLPath(final T pomXMLPath) {
+		this.pomXMLPathProperty().set(Path.of(pomXMLPath.toString()));
 	}
 
 	/*
@@ -77,8 +82,8 @@ public final class StartWindowViewModel implements ServiceConverter<List<Path>> 
 		return this.sessionList.get();
 	}
 
-	public void setSessionList(final List<Session> sessionList) {
-		this.sessionList.get().setAll(sessionList);
+	public void loadSessions() {
+		this.sessionList.get().setAll(sessionManager.getLoadedSessions());
 	}
 
 	/*
@@ -112,33 +117,11 @@ public final class StartWindowViewModel implements ServiceConverter<List<Path>> 
 //	}
 
 	/*
-	 * get services
-	 */
-	public Service<List<Path>> getClassPathloaderService() {
-		return this.classPathLoaderService;
-	}
-
-	public Service<List<Path>> getPomModuleDependencyLoaderService() {
-		return this.pomDependenciesLoaderService;
-	}
-
-	/*
 	 * init method
 	 */
 	public void init(Session session) {
-		if(session != null) {
-			sessionManager.loadSession(session);
-		} else {
-			sessionManager.createNewSession(getClassPath(), getPomXMLPath());
-		}
-
-		// set service event handlers
-		classPathLoaderService.setOnSucceeded(_ -> sessionManager.getSession().setJavaFXClassList(classPathLoaderService.getValue()));
-		classPathLoaderService.setOnFailed(wst -> ExceptionHandlerImpl.logException(wst.getSource().getException()));
-		pomDependenciesLoaderService.setOnSucceeded(_ -> sessionManager.getSession().setPomDependenciesPathList(pomDependenciesLoaderService.getValue()));
-		pomDependenciesLoaderService.setOnFailed(wst -> ExceptionHandlerImpl.logException(wst.getSource().getException()));
-
-		// start services
+		Optional.ofNullable(session).ifPresentOrElse(sessionManager::loadSession,
+				() -> sessionManager.createNewSession(getClassPath(), getPomXMLPath()));
 		classPathLoaderService.start();
 		pomDependenciesLoaderService.start();
 	}
@@ -148,19 +131,28 @@ public final class StartWindowViewModel implements ServiceConverter<List<Path>> 
 		sessionManager.saveActiveSession();
 	}
 
-	public void loadSessions() {
-		try {
-			setSessionList(sessionManager.getLoadedSessions());
-		} catch (IOException e) {
-			ExceptionHandlerImpl.logException(e);
-		}
+	public void deleteSessionFile(final Session session) {
+		sessionManager.deleteSessionFile(session);
+        sessionList.get().remove(session);
 	}
 
-	public void deleteSessionFile(Session session) {
-		try {
-			Files.delete(sessionManager.getSessionsDir().resolve(session.getApplicationModuleName() + sessionManager.getSerialFileExt()));
-		} catch (IOException e) {
-			ExceptionHandlerImpl.logException(e);
-		}
+	public void loadClassPath(final File dir) {
+		buildPathLoader(dir, true);
+	}
+
+	public void loadPomXMLPath(final File file) {
+		buildPathLoader(file, false);
+	}
+
+	private void buildPathLoader(File file, boolean isClassPathLoading) {
+		Optional.ofNullable(file)
+        		.ifPresent(response -> {
+        			Path path = response.toPath();
+        			if(isClassPathLoading) {
+        				setClassPath(path);
+        			} else {
+        				setPomXMLPath(path);
+        			}
+        		});
 	}
 }

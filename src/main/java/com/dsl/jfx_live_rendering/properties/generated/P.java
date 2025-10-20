@@ -1,9 +1,9 @@
 package com.dsl.jfx_live_rendering.properties.generated;
 
+import com.dsl.classgen.annotation.GeneratedInnerField;
+import com.dsl.classgen.annotation.GeneratedInnerStaticClass;
 import com.dsl.classgen.annotation.GeneratedOutterClass;
 import com.dsl.classgen.annotation.GeneratedPrivateConstructor;
-import com.dsl.classgen.annotation.GeneratedInnerStaticClass;
-import com.dsl.classgen.annotation.GeneratedInnerField;
 
 @GeneratedOutterClass()
 public final class P {
@@ -86,6 +86,9 @@ public final class P {
 
         @GeneratedInnerField(key = "select.javafx.class", hash = -1242325535)
         public static final String SELECT_JAVAFX_CLASS = "Select JavaFX Class";
+
+        @GeneratedInnerField(key = "clear.selection", hash = 634949935)
+        public static final String CLEAR_SELECTION = "Clear Selection";
     }
 
     @GeneratedInnerStaticClass(filePath = "src/main/resources/values/strings/status.properties", hash = 1310452119, javaType = String.class)
@@ -139,5 +142,28 @@ public final class P {
 
         @GeneratedInnerField(key = "valid.pom", hash = -2116690322)
         public static final String VALID_POM = "Validated pom.xml.";
+
+        @GeneratedInnerField(key = "session.classpath.override", hash = 1337873919)
+        public static final String SESSION_CLASSPATH_OVERRIDE = "WARNING: ClassPath of session %s is being changed. It is recommended to also update the path of the pom.xml file.";
+
+        @GeneratedInnerField(key = "session.classpath.new", hash = 1937220326)
+        public static final String SESSION_CLASSPATH_NEW = "NOTE: A new session will be created with the classpath %s.";
+
+        @GeneratedInnerField(key = "session.pom.xml.override", hash = -69016223)
+        public static final String SESSION_POM_XML_OVERRIDE = "WARNING: Pom.xml of session %s is being changed. It is recommended to select the classpath corresponding to the selected pom.xml file.";
+
+        @GeneratedInnerField(key = "session.pom.xml.new", hash = -755108843)
+        public static final String SESSION_POM_XML_NEW = "NOTE: A new session will be created with pom.xml %s.";
+    }
+
+    @GeneratedInnerStaticClass(filePath = "src/main/resources/values/strings/menu/context-menu-options.properties", hash = -1124698579, javaType = String.class)
+    public static final class ContextMenuOptions {
+
+        @GeneratedPrivateConstructor()
+        private ContextMenuOptions() {
+        }
+
+        @GeneratedInnerField(key = "context.menu.delete", hash = 1441654161)
+        public static final String CONTEXT_MENU_DELETE = "Delete";
     }
 }

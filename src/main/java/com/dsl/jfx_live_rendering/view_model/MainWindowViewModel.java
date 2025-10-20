@@ -1,5 +1,17 @@
 package com.dsl.jfx_live_rendering.view_model;
 
+import module javafx.controls;
+import com.dsl.jfx_live_rendering.engine.Context;
+import com.dsl.jfx_live_rendering.engine.concurrent.ClassPathLoader;
+import com.dsl.jfx_live_rendering.engine.concurrent.PomDependencyResolver;
+import com.dsl.jfx_live_rendering.engine.impl.ExceptionHandlerImpl;
+import com.dsl.jfx_live_rendering.engine.impl.LoggerImpl;
+import com.dsl.jfx_live_rendering.engine.impl.WatchServiceImpl;
+import com.dsl.jfx_live_rendering.gui.ContentTab;
+import com.dsl.jfx_live_rendering.models.ProcessedPathModel;
+import com.dsl.jfx_live_rendering.session_manager.Session;
+import com.dsl.jfx_live_rendering.session_manager.SessionManager;
+
 import java.nio.file.Path;
 import java.nio.file.WatchEvent.Kind;
 import java.util.HashMap;
@@ -8,42 +20,33 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 
-import com.dsl.jfx_live_rendering.engine.Context;
-import com.dsl.jfx_live_rendering.engine.concurrent.ClassPathLoader;
-import com.dsl.jfx_live_rendering.engine.concurrent.PomDependencyResolver;
-import com.dsl.jfx_live_rendering.engine.impl.ExceptionHandlerImpl;
-import com.dsl.jfx_live_rendering.engine.impl.LoggerImpl;
-import com.dsl.jfx_live_rendering.engine.impl.WatchServiceImpl;
-import com.dsl.jfx_live_rendering.gui.ContentTab;
-import com.dsl.jfx_live_rendering.gui.FXUtils;
-import com.dsl.jfx_live_rendering.models.ProcessedPathModel;
-import com.dsl.jfx_live_rendering.session_manager.Session;
-import com.dsl.jfx_live_rendering.session_manager.SessionManager;
+public final class MainWindowViewModel implements ServiceConverter<List<Path>> {
 
-import module javafx.base;
-import module javafx.controls;
+	private final Map<Path, ContentTab> contentTabMap = new HashMap<>();
 
-public final class MainWindowViewModel implements ServiceConverter<List<Path>>, FXUtils {
+	private final ObjectProperty<ObservableList<Path>> javaFXClassList = new SimpleObjectProperty<>(FXCollections.observableArrayList());
+	private final StringProperty log = new SimpleStringProperty();
 
-	private Map<String, ContentTab> contentTabMap = new HashMap<>();
+	private final ObjectProperty<Entry<Kind<Path>, List<Path>>> changedFileEntry = new SimpleObjectProperty<>();
 
-	private ObjectProperty<ObservableList<Path>> javaFXClassList = new SimpleObjectProperty<>(FXCollections.observableArrayList());
-	private StringProperty log = new SimpleStringProperty();
+    private final BooleanProperty tabSelected = new SimpleBooleanProperty();
+    private final BooleanProperty alwaysShowLogPane = new SimpleBooleanProperty();
 
-	private ObjectProperty<Entry<Kind<Path>, List<Path>>> changedPathEntry = new SimpleObjectProperty<>();
-
-	Service<List<Path>> classPathLoaderService = Context.getService(ClassPathLoader.class);
-	Service<List<Path>> pomDependenciesLoaderService = Context.getService(PomDependencyResolver.class);
+	private final Service<List<Path>> classPathLoaderService = Context.getService(ClassPathLoader.class);
+	private final Service<List<Path>> pomDependenciesLoaderService = Context.getService(PomDependencyResolver.class);
 
 	// session instance
-	private Session session = SessionManager.getInstance().getSession();
+	private final Session session = SessionManager.getInstance().getSession();
 
 	public MainWindowViewModel() {
 		new WatchServiceImpl().registerDirsAndStartWatch();
 		setJavaFXClassListToProperty(session.getJavaFXClassList());
 
 		// stacking event handlers without overriding previous ones
-		classPathLoaderService.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, _ -> setJavaFXClassListToProperty(session.getJavaFXClassList()));
+		classPathLoaderService.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, _ -> {
+            session.setJavaFXClassList(classPathLoaderService.getValue());
+            setJavaFXClassListToProperty(session.getJavaFXClassList());
+        });
 
 		// thread to update log property
 		Thread logConsumerThread = new Thread(() -> {
@@ -56,7 +59,7 @@ public final class MainWindowViewModel implements ServiceConverter<List<Path>>, 
 		Thread changedPathConsumerThread = new Thread(() -> {
 			do {
 				try {
-					setChangedPathEntry(Context.getChangedPathEntry());
+					setChangedFileEntry(Context.getChangedPathEntry());
 				} catch (InterruptedException e) {
 					ExceptionHandlerImpl.logException(e);
 				}
@@ -90,36 +93,37 @@ public final class MainWindowViewModel implements ServiceConverter<List<Path>>, 
 	/*
 	 * changedPathEntry property methods
 	 */
-	public ObjectProperty<Entry<Kind<Path>, List<Path>>> changedPathEntryProperty() {
-		return this.changedPathEntry;
+	public ObjectProperty<Entry<Kind<Path>, List<Path>>> changedFileEntryProperty() {
+		return this.changedFileEntry;
 	}
 
-	public Entry<Kind<Path>, List<Path>> getChangedPathEntry() {
-		return this.changedPathEntry.get();
+	public Entry<Kind<Path>, List<Path>> getChangedFileEntry() {
+		return this.changedFileEntry.get();
 	}
 
-	public void setChangedPathEntry(final Entry<Kind<Path>, List<Path>> changedPathEntry) {
-		this.changedPathEntry.set(changedPathEntry);
+	public void setChangedFileEntry(final Entry<Kind<Path>, List<Path>> changedFileEntry) {
+		this.changedFileEntry.set(changedFileEntry);
 	}
 
 	/*
 	 * tabMap methods
 	 */
-	public ContentTab getContentTabFromMap(String tabName) {
-		return contentTabMap.get(tabName);
+	public ContentTab getContentTabFromMap(Path path) {
+		return contentTabMap.get(path);
 	}
 
-	public <T extends Tab> void addContentTabToMap(final List<T> tabList) {
-		tabList.stream().forEach(tab -> {
-			ContentTab ct = FXUtils.tabCast(tab);
-			if(contentTabMap.computeIfPresent(ct.getText(), (_, _) -> ct) == null) {
-				contentTabMap.put(ct.getText(), ct);
+	public <T extends Entry<? extends Path, ? extends Tab>> void addContentTabToMap(final List<T> tabEntryList) {
+        tabEntryList.forEach(entry -> {
+            Path path = entry.getKey();
+			ContentTab ct = (ContentTab) entry.getValue();
+			if(contentTabMap.computeIfPresent(path, (_, _) -> ct) == null) {
+				contentTabMap.computeIfAbsent(path, _ -> ct);
 			}
 		});
 	}
 
-	public <T extends Tab> void removeContentTabFromMap(final List<T> tabList) {
-		tabList.stream().forEach(tab -> contentTabMap.remove(tab.getText()));
+	public <T extends Path> void removeContentTabFromMap(final List<T> pathList) {
+        pathList.forEach(contentTabMap::remove);
 	}
 
 	/*
@@ -150,8 +154,8 @@ public final class MainWindowViewModel implements ServiceConverter<List<Path>>, 
 	}
 
 	public void setClassPath(Path classPath) {
-		session.setClassPath(classPath);
-		classPathLoaderService.restart();
+        session.setClassPath(classPath);
+        classPathLoaderService.restart();
 	}
 
 	// get/set pom.xml path
@@ -165,15 +169,32 @@ public final class MainWindowViewModel implements ServiceConverter<List<Path>>, 
 	}
 
 	public Entry<Kind<Path>, List<ContentTab>> transformEntries() {
-		var entry = getChangedPathEntry();
+		var entry = getChangedFileEntry();
 		List<ContentTab> tabs = entry.getValue().stream().map(ProcessedPathModel::new).toList().stream()
-				.map(ppm -> getContentTabFromMap(ppm.getFileName())).filter(Objects::nonNull)
+				.map(ppm -> getContentTabFromMap(ppm.getPath())).filter(Objects::nonNull)
 				.toList();
 		return Map.entry(entry.getKey(), tabs);
 	}
 
-	@Override
-	public Scene createScene() {
-		return null;
-	}
+    // tabSelected property
+    public boolean isTabSelected() {
+        return tabSelected.get();
+    }
+
+    public BooleanProperty tabSelectedProperty() {
+        return tabSelected;
+    }
+
+    // alwaysShowLogPane property
+    public boolean isAlwaysShowLogPane() {
+        return alwaysShowLogPane.get();
+    }
+
+    public void setIfAlwaysShowLogPane(boolean value) {
+        alwaysShowLogPane.set(value);
+    }
+
+    public BooleanProperty alwaysShowLogPaneProperty() {
+        return alwaysShowLogPane;
+    }
 }

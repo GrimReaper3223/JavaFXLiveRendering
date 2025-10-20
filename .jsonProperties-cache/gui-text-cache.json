@@ -1,6 +1,6 @@
 {
   "filePath": "src/main/resources/values/strings/gui-text.properties",
-  "fileHash": 1312547048,
+  "fileHash": -1895290654,
   "javaType": "java.lang.String",
   "entries": {
     "-1892462351": {
@@ -62,6 +62,11 @@
       "propKey": "choose.another.classpath",
       "rawPropValue": "Choose Another Class Path",
       "parsedPropValue": "\"Choose Another Class Path\""
+    },
+    "634949935": {
+      "propKey": "clear.selection",
+      "rawPropValue": "Clear Selection",
+      "parsedPropValue": "\"Clear Selection\""
     },
     "-2111126029": {
       "propKey": "force.reload",

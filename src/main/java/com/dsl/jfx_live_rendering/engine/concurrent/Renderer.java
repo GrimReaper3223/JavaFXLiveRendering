@@ -1,17 +1,16 @@
 package com.dsl.jfx_live_rendering.engine.concurrent;
 
+import com.dsl.jfx_live_rendering.engine.impl.CustomURLClassLoader;
+import com.dsl.jfx_live_rendering.session_manager.Session;
+import com.dsl.jfx_live_rendering.session_manager.SessionManager;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+
 import java.lang.module.Configuration;
 import java.lang.module.ModuleFinder;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.concurrent.Callable;
-
-import com.dsl.jfx_live_rendering.engine.impl.CustomURLClassLoader;
-import com.dsl.jfx_live_rendering.session_manager.Session;
-import com.dsl.jfx_live_rendering.session_manager.SessionManager;
-
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 
 public class Renderer implements Callable<Node> {
 
@@ -33,6 +32,6 @@ public class Renderer implements Callable<Node> {
 		ClassLoader cl = layer.defineModulesWithOneLoader(config, new CustomURLClassLoader(classpath.toUri().toURL())).findLoader(applicationModuleName);
 		FXMLLoader.setDefaultClassLoader(cl);
 		Class<?> cls = cl.loadClass(binaryClassName);
-		return Node.class.cast(cls.getDeclaredConstructor().newInstance());
+		return (Node) cls.getDeclaredConstructor().newInstance();
 	}
 }

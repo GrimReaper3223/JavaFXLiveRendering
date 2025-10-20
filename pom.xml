@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.dsl.jfxLiveRender</groupId>
-	<artifactId>JFXLiveRenderer</artifactId>
+	<artifactId>JavaFXLiveRenderer</artifactId>
 	<version>0.1</version>
 	<packaging>jar</packaging>
 
@@ -11,6 +11,8 @@
 		<project.mainClass>com.dsl.jfx_live_renderer.Main</project.mainClass>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+
+    <name>${project.artifactId}</name>
 
 	<dependencies>
 		<!-- PropsClassGenerator -->
@@ -73,7 +75,35 @@
 			<artifactId>ikonli-materialdesign2-pack</artifactId>
 			<version>12.3.1</version>
 		</dependency>
-	</dependencies>
+        <!-- AtlantaFX dependency -->
+        <dependency>
+            <groupId>io.github.mkpaz</groupId>
+            <artifactId>atlantafx-base</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+	<!-- For dependency conflict resolution -->
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>32.1.0-jre</version>
+			</dependency>
+			<dependency>
+				<groupId>org.checkerframework</groupId>
+				<artifactId>checker-qual</artifactId>
+				<version>3.49.4</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<resources>
