@@ -1,0 +1,1 @@
+jpackage --type app-image -i libs -n JavaFXLiveRendering --main-class com.dsl.jfx_live_rendering.Main --main-jar JavaFXLiveRenderer-0.1.jar --dest release --module-path libs --add-modules javafx.base,javafx.controls,javafx.graphics,javafx.web,javafx.fxml
