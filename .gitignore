@@ -5,4 +5,10 @@
 /release
 sessions
 /.vscode/launch.json
+<<<<<<< HEAD
+=======
+/.jsonProperties-cache/
+/.idea/
+/.settings/
+>>>>>>> 1620c7b58ae6d3bb7c0605ad698a998e04736f75
 deps.txt
