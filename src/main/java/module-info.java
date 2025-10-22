@@ -1,4 +1,4 @@
-module jfxLiveRendering {
+module javaFXLiveRendering {
 	requires transitive javafx.base;
     requires transitive javafx.graphics;
     requires transitive javafx.controls;

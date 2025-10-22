@@ -1,80 +1,80 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.dsl.jfxLiveRender</groupId>
-	<artifactId>JavaFXLiveRenderer</artifactId>
-	<version>0.1</version>
-	<packaging>jar</packaging>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.dsl.jfxLiveRender</groupId>
+    <artifactId>JavaFXLiveRenderer</artifactId>
+    <version>0.1</version>
+    <packaging>jar</packaging>
 
-	<properties>
-		<project.mainClass>com.dsl.jfx_live_renderer.Main</project.mainClass>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+    <properties>
+        <project.mainClass>com.dsl.jfx_live_rendering.Main</project.mainClass>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <name>${project.artifactId}</name>
 
-	<dependencies>
-		<!-- PropsClassGenerator -->
-		<dependency>
-			<groupId>io.github.grimreaper3223</groupId>
-			<artifactId>PropsClassGenerator</artifactId>
-			<version>1.2</version>
-		</dependency>
-		<!-- JavaFX -->
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-base</artifactId>
-			<version>25-ea+21</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-graphics</artifactId>
-			<version>25-ea+21</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-controls</artifactId>
-			<version>25-ea+21</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-fxml</artifactId>
-			<version>25-ea+21</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-web</artifactId>
-			<version>25-ea+21</version>
-		</dependency>
-		<!-- Log4j2 -->
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-api</artifactId>
-			<version>2.23.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-core</artifactId>
-			<version>2.23.1</version>
-		</dependency>
-		<!-- ControlsFX -->
-		<dependency>
-			<groupId>org.controlsfx</groupId>
-			<artifactId>controlsfx</artifactId>
-			<version>11.2.2</version>
-		</dependency>
-		<!-- Ikonli dependency -->
-		<dependency>
-			<groupId>org.kordamp.ikonli</groupId>
-			<artifactId>ikonli-javafx</artifactId>
-			<version>12.3.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.kordamp.ikonli</groupId>
-			<artifactId>ikonli-materialdesign2-pack</artifactId>
-			<version>12.3.1</version>
-		</dependency>
+    <dependencies>
+        <!-- PropsClassGenerator -->
+        <dependency>
+            <groupId>io.github.grimreaper3223</groupId>
+            <artifactId>PropsClassGenerator</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <!-- JavaFX -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>25-ea+21</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>25-ea+21</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>25-ea+21</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>25-ea+21</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>25-ea+21</version>
+        </dependency>
+        <!-- Log4j2 -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.23.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.23.1</version>
+        </dependency>
+        <!-- ControlsFX -->
+        <dependency>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+            <version>11.2.2</version>
+        </dependency>
+        <!-- Ikonli dependency -->
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-javafx</artifactId>
+            <version>12.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-materialdesign2-pack</artifactId>
+            <version>12.3.1</version>
+        </dependency>
         <!-- AtlantaFX dependency -->
         <dependency>
             <groupId>io.github.mkpaz</groupId>
@@ -84,100 +84,130 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>RELEASE</version>
-            <scope>compile</scope>
+            <version>26.0.2-1</version>
         </dependency>
     </dependencies>
 
-	<!-- For dependency conflict resolution -->
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>com.google.guava</groupId>
-				<artifactId>guava</artifactId>
-				<version>32.1.0-jre</version>
-			</dependency>
-			<dependency>
-				<groupId>org.checkerframework</groupId>
-				<artifactId>checker-qual</artifactId>
-				<version>3.49.4</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
 
-	<build>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<includes>
-					<include>**/*</include>
-				</includes>
-			</resource>
-		</resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.7.0</version>
+                <executions>
+                    <execution>
+                        <id>export project dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <outputDirectory>libs</outputDirectory>
+                    <overWriteIfNewer>true</overWriteIfNewer>
+                </configuration>
+            </plugin>
 
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.14.0</version>
-				<configuration>
-					<release>25</release>
-					<enablePreview>true</enablePreview>
-				</configuration>
-			</plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.14.0</version>
+                <configuration>
+                    <release>25</release>
+                    <enablePreview>true</enablePreview>
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.4.2</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<addBuildEnvironmentEntries>true</addBuildEnvironmentEntries>
-							<mainClass>${project.mainClass}</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.2</version>
+                <configuration>
+                    <outputDirectory>libs</outputDirectory>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <addBuildEnvironmentEntries>true</addBuildEnvironmentEntries>
+                            <mainClass>${project.mainClass}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<groupId>org.openjfx</groupId>
-				<artifactId>javafx-maven-plugin</artifactId>
-				<version>0.0.8</version>
-				<executions>
-					<execution>
-						<!-- Default configuration for running -->
-						<!-- Usage: mvn clean javafx:run -->
-						<id>default-cli</id>
-						<configuration>
-							<mainClass>${project.mainClass}</mainClass>
-						</configuration>
-					</execution>
-					<execution>
-						<!-- Configuration for manual attach debugging -->
-						<!-- Usage: mvn clean javafx:run@debug -->
-						<id>debug</id>
-						<configuration>
-							<options>
-								<option>
-									-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=localhost:8000</option>
-							</options>
-							<mainClass>${project.mainClass}</mainClass>
-						</configuration>
-					</execution>
-					<execution>
-						<!-- Configuration for automatic IDE debugging -->
-						<id>ide-debug</id>
-						<configuration>
-							<options>
-								<option>
-									-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</option>
-							</options>
-							<mainClass>${project.mainClass}</mainClass>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
+<!--            <plugin>-->
+<!--                <artifactId>maven-assembly-plugin</artifactId>-->
+<!--                <version>3.7.1</version>-->
+<!--                <configuration>-->
+<!--                    <archive>-->
+<!--                        <manifest>-->
+<!--                            <mainClass>${project.mainClass}</mainClass>-->
+<!--                            <addClasspath>true</addClasspath>-->
+<!--                        </manifest>-->
+<!--                    </archive>-->
+<!--                    <descriptorRefs>-->
+<!--                        <descriptorRef>jar-with-dependencies</descriptorRef>-->
+<!--                    </descriptorRefs>-->
+<!--                </configuration>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>assemble-all</id>-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>single</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
 
-	</build>
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <executions>
+                    <execution>
+                        <!-- Default configuration for running -->
+                        <!-- Usage: mvn clean javafx:run -->
+                        <id>default-cli</id>
+                        <configuration>
+                            <mainClass>${project.mainClass}</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- Configuration for manual attach debugging -->
+                        <!-- Usage: mvn clean javafx:run@debug -->
+                        <id>debug</id>
+                        <configuration>
+                            <options>
+                                <option>
+                                    -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=localhost:8000
+                                </option>
+                            </options>
+                            <mainClass>${project.mainClass}</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- Configuration for automatic IDE debugging -->
+                        <id>ide-debug</id>
+                        <configuration>
+                            <options>
+                                <option>
+                                    -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}
+                                </option>
+                            </options>
+                            <mainClass>${project.mainClass}</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+    </build>
 </project>

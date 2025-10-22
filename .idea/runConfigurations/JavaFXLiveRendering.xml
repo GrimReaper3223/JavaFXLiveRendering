@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="JavaFXLiveRendering" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.dsl.jfx_live_rendering.Main" />
+    <module name="JavaFXLiveRenderer" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
